@@ -1,0 +1,82 @@
+\documentclass[10pt,a4paper]{article}
+	% 使用12pt(对应于中文的小四号字)
+	% \usepackage{xeCJK} 
+	% \setmainfont{Times New Roman} 
+	% \setCJKmainfont[BoldFont=Hei]{Hei} 
+	\usepackage{ctex}
+	\usepackage{geometry}   %设置页边距的宏包
+    \usepackage{titlesec}   %设置页眉页脚的宏包
+    \usepackage{amssymb}
+    \usepackage{amsmath}
+    \geometry{left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}  %设置 上、左、下、右 页边距
+	\begin{document}
+	\newpagestyle{main}{            
+		\sethead{哈尔滨工业大学}{数据库系统\_第一次作业}{1160300314 朱明彦}     %设置页眉
+		% \setfoot{左页脚}{中页脚}{右页脚}      %设置页脚，可以在页脚添加 \thepage  显示页数
+		\setfoot{}{}{\thepage}
+		\headrule                                      % 添加页眉的下划线
+		% \footrule                                       %添加页脚的下划线
+	}
+	\pagestyle{main}    %使用该style
+	
+	% \setlength{\baselineskip}{15.6pt}
+	\setlength{\parskip}{0pt}
+	\renewcommand{\baselinestretch}{1.5}
+	
+    \paragraph{一、}
+    \subparagraph{1. A} 可以举出以下反例
+
+    \begin{minipage}{\textwidth} 
+        \begin{minipage}[t]{0.35\textwidth} 
+        \centering 
+        \makeatletter\def\@captype{table}\makeatother\caption{R} 
+        \begin{tabular}{c|c}
+            \hline
+            A & F \\ \hline
+            1 & 2 \\
+            3 & 4 \\
+            \hline
+        \end{tabular} 
+    \end{minipage} 
+    \begin{minipage}[t]{0.35\textwidth} 
+        \centering 
+        \makeatletter\def\@captype{table}\makeatother\caption{S} 
+        \begin{tabular}{c|c}
+            \hline
+            A & F \\ \hline
+            1 & 2 \\
+            3 & 4 \\
+            \hline
+        \end{tabular} 
+
+    \end{minipage} 
+
+    \end{minipage}
+    \vspace{0.5cm}\\
+    可以看到，对于左式$\Pi_F(R_1 \cap R_2) = \varnothing$；而对于右式$\Pi_F(R_1) \cap \Pi_F(R_2) = \{2\}$。因而A错误。
+
+    \subparagraph{2. A} 对于R$\times$S的前r列为R的一个元组，后s列为S的一个元组，故原来比较中使用的为R的第i列和S的第j列，此处应该换为R$\times$S的第i列和第j+r列。
+    \paragraph{二、}
+    \subparagraph{1.} $\Pi_{SNO, PNO}(SPJ) \div \Pi_{SNO}(\sigma_{CITY = LONDON}(S))$
+    \subparagraph{2.} $\Pi_{PNO}(\sigma_{S.CITY = J.CITY}(SPJ \Join S \Join J))$
+    \subparagraph{3.} $\Pi_{JNAME}(\sigma_{SNO = S1}(SPJ) \Join J)$
+    \subparagraph{4.} $\Pi_{JNAME}((SPJ \Join J) \Join (\Pi_{PNO}(\sigma_{COLOR = red}(P))))$
+    \subparagraph{5.} $\Pi_{JNAME, PNO}(SPJ \Join J) \div \Pi_{PNO}(P)$
+    \subparagraph{6.} $\Pi_{SNAME, PNO}(SPJ \Join S) \div \sigma_{PNO = P1 \lor PNO = P2}(\Pi_{PNO}(P))$
+    \subparagraph{7.} $\Pi_{PNAME}(P \Join \Pi_{COLOR}(\sigma_{PNAME = "TV"}(P)))$
+
+    \paragraph{三、}
+    \subparagraph{(1)} $\{t | \exists u \in R \land t[B] = u[B] \land t[C] = u[C]\}$
+    \subparagraph{(2)} $\{t | t \in R \land t[B] > t[C]\}$
+    \subparagraph{(3)} $\{t | t \in R \lor t \in S\}$
+    \subparagraph{(4)} $\{t | t \in R \land t \in S\}$
+    \subparagraph{(5)} $\{t | t \in R \land t \notin S\}$
+    \subparagraph{(6)} $\{t | \exists r \in R \land \exists s \in S \land r[B] = s[B] \land t[A] = r[A] \land t[B] = r[B] \land t[C] = s[C]\}$
+    \subparagraph{(7)}
+    \begin{equation*}
+        \begin{split}
+            & \{t | t \in \{u | \exists r \in R \land u[A] = r[A] \land u[B] = r[B]\} \\
+            &      \land (\forall s \in \{v | \exists p \in S \land v[C] = p[C]\})(\exists r \in R \land r[A] = t[A] \land r[B] = t[B] \land s[C] = r[C])\}
+        \end{split}
+    \end{equation*}
+\end{document}
