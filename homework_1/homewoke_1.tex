@@ -79,4 +79,17 @@
             &      \land (\forall s \in \{v | \exists p \in S \land v[C] = p[C]\})(\exists r \in R \land r[A] = t[A] \land r[B] = t[B] \land s[C] = r[C])\}
         \end{split}
     \end{equation*}
+
+    \paragraph{四、}
+    \begin{itemize}
+    \item 联系：限制在安全表达式范围内的元组关系演算，限制在安全表达式范围内的域关系演算以及关系代数的表达能力等价。
+    \item 区别：
+     \begin{itemize}
+        \item \textbf{关系代数}是一种抽象的查询语言，它用对关系的运算来表达查询；并且有限关系上的关系代数操作结果都不会导致无限关系和无穷验证，因此关系代数系统是安全的。
+        \item \textbf{元组关系演算}是非过程化的查询语言，只描述所需信息，而不给出获得该信息的具体过程；并且元组关系演算系统不是安全的。
+        \item \textbf{域关系演算}是另一种关系演算的另一种形式，使用从属性域中取值的域变量，而不是整个元组的值；并且关系演算系统也不是安全的。
+    \end{itemize}
+    \end{itemize}
+    
+
 \end{document}
