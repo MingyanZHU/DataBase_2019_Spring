@@ -44,8 +44,8 @@
         \begin{tabular}{c|c}
             \hline
             A & F \\ \hline
-            1 & 2 \\
-            3 & 4 \\
+            2 & 2 \\
+            3 & 2 \\
             \hline
         \end{tabular} 
 
@@ -58,7 +58,7 @@
     \subparagraph{2. A} 对于R$\times$S的前r列为R的一个元组，后s列为S的一个元组，故原来比较中使用的为R的第i列和S的第j列，此处应该换为R$\times$S的第i列和第j+r列。
     \paragraph{二、}
     \subparagraph{1.} $\Pi_{SNO, PNO}(SPJ) \div \Pi_{SNO}(\sigma_{CITY = LONDON}(S))$
-    \subparagraph{2.} $\Pi_{PNO}(\sigma_{S.CITY = J.CITY}(SPJ \Join S \Join J))$
+    \subparagraph{2.} $\Pi_{PNO}(SPJ \Join S \Join J)$
     \subparagraph{3.} $\Pi_{JNAME}(\sigma_{SNO = S1}(SPJ) \Join J)$
     \subparagraph{4.} $\Pi_{JNAME}((SPJ \Join J) \Join (\Pi_{PNO}(\sigma_{COLOR = red}(P))))$
     \subparagraph{5.} $\Pi_{JNAME, PNO}(SPJ \Join J) \div \Pi_{PNO}(P)$
