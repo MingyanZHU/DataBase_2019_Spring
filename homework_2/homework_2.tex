@@ -1,0 +1,99 @@
+\documentclass[10pt,a4paper]{article}
+	% 使用12pt(对应于中文的小四号字)
+	% \usepackage{xeCJK} 
+	% \setmainfont{Times New Roman} 
+	% \setCJKmainfont[BoldFont=Hei]{Hei} 
+	\usepackage{ctex}
+	\usepackage{geometry}   %设置页边距的宏包
+    \usepackage{titlesec}   %设置页眉页脚的宏包
+    \usepackage{amssymb}
+    \usepackage{amsmath}
+    \usepackage{minted}
+    \geometry{left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}  %设置 上、左、下、右 页边距
+	\begin{document}
+	\newpagestyle{main}{            
+		\sethead{哈尔滨工业大学}{数据库系统\_第二次作业}{1160300314 朱明彦}     %设置页眉
+		% \setfoot{左页脚}{中页脚}{右页脚}      %设置页脚，可以在页脚添加 \thepage  显示页数
+		\setfoot{}{}{\thepage}
+		\headrule                                      % 添加页眉的下划线
+		% \footrule                                       %添加页脚的下划线
+	}
+	\pagestyle{main}    %使用该style
+	
+	% \setlength{\baselineskip}{15.6pt}
+	\setlength{\parskip}{0pt}
+	\renewcommand{\baselinestretch}{1.5}
+	
+    \paragraph{一、}
+    \begin{enumerate}
+        \item[1)] 
+        \begin{minted}{SQL}
+            SELECT CNAME, TEACHER
+            FROM S, C, SC
+            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.S# = "003"
+        \end{minted}
+        \item[2)]\begin{minted}{SQL}
+            SELECT SNAME
+            FROM S, C, SC
+            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.AGE = "男"
+                 AND C.TEACHER = "程军"
+        \end{minted}
+        \item[3)]\begin{minted}{SQL}
+            SELECT CNAME
+            FROM C
+            EXCEPT
+            SELECT CNAME
+            FROM S, C, SC
+            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.SNAME = "刘丽"
+        \end{minted}
+        \item[4)]\begin{minted}{SQL}
+            SELECT S#, SNAME
+            FROM S, SC
+            WHERE S.S# = SC.S#
+            GROUP BY S.S# HAVING AVG(GRADE) < 60
+        \end{minted}
+        \item[5)]\begin{minted}{SQL}
+            SELECT S#
+            FROM S, SC
+            WHERE S.S# = SC.S#
+            GROUP BY S.S# HAVING COUNT(*) >= 3
+            ORDER BY S# ASC
+        \end{minted}
+    \end{enumerate}
+    
+    \paragraph{二、}
+    \begin{enumerate}
+        \item[1)]\begin{minted}{SQL}
+            CREATE TABLE Classes
+            (
+                class CHAR(20) PRIMARY KEY,
+                type CHAR(2),
+                country CHAR(15),
+                numGuns SMALLINT,
+                bore, SMALLINT,
+                displacement, INT
+            );
+        \end{minted}
+        
+        \begin{minted}{SQL}
+            CREATE TABLE Ships
+            (
+                name CHAR(20) PRIMARY KEY,
+                class CHAR(20),
+                launched SMALLINT,
+                FOREIGN KEY (class) REFERENCES Classes(class)
+            );
+        \end{minted}
+
+        说明，主键可以唯一区分实体，外键需要存在。
+        \item[2)]\begin{itemize}
+            \item[a.]
+            \item[b.]
+            \item[c.]  
+        \end{itemize}
+        \item[3)] 
+    \end{enumerate}
+    \paragraph{三、}
+    
+
+\end{document}
