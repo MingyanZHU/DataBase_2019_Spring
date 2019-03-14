@@ -30,13 +30,13 @@
         \begin{minted}{SQL}
             SELECT CNAME, TEACHER
             FROM S, C, SC
-            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.S# = "003"
+            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.S# = "003";
         \end{minted}
         \item[2)]\begin{minted}{SQL}
             SELECT SNAME
             FROM S, C, SC
             WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.AGE = "男"
-                 AND C.TEACHER = "程军"
+                 AND C.TEACHER = "程军";
         \end{minted}
         \item[3)]\begin{minted}{SQL}
             SELECT CNAME
@@ -44,20 +44,20 @@
             EXCEPT
             SELECT CNAME
             FROM S, C, SC
-            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.SNAME = "刘丽"
+            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.SNAME = "刘丽";
         \end{minted}
         \item[4)]\begin{minted}{SQL}
             SELECT S#, SNAME
             FROM S, SC
             WHERE S.S# = SC.S#
-            GROUP BY S.S# HAVING AVG(GRADE) < 60
+            GROUP BY S.S# HAVING AVG(GRADE) < 60;
         \end{minted}
         \item[5)]\begin{minted}{SQL}
             SELECT S#
             FROM S, SC
             WHERE S.S# = SC.S#
             GROUP BY S.S# HAVING COUNT(*) >= 3
-            ORDER BY S# ASC
+            ORDER BY S# ASC;
         \end{minted}
     \end{enumerate}
     
@@ -85,15 +85,237 @@
             );
         \end{minted}
 
-        说明，主键可以唯一区分实体，外键需要存在。
+        说明，主键可以唯一区分实体，外键\texttt{class}需要存在。
         \item[2)]\begin{itemize}
-            \item[a.]
-            \item[b.]
-            \item[c.]  
+            \item[a.]\begin{minted}{SQL}
+                INSERT 
+                INTO Classes
+                VALUES("Nelson", "bb", "Gt.Britain", 9, 16, 34000);
+
+                INSERT
+                INTO Ships
+                VALUES("Nelson", "Nelson", 1927);
+
+                INSERT
+                INTO Ships
+                VALUES("Rodney", "Nelson", 1927);
+            \end{minted}
+            \item[b.]\begin{minted}{SQL}
+                DELETE
+                FROM Ships
+                WHERE name IN
+                (
+                    SELECT
+                    FROM Ships, Outcomes
+                    WHERE Ships.name = Outcomes.ship
+                        AND Outcomes.result = "沉没"
+                );
+            \end{minted}
+            \item[c.]\begin{minted}{SQL}
+                UPDATE Classes
+                SET bore = bore * 2.5;
+
+                UPDATE Classes
+                SET displacement = displacement / 1.1;
+            \end{minted}  
         \end{itemize}
-        \item[3)] 
+        \item[3)]\begin{minted}{SQL}
+            CREATE VIEW (class, type, numGuns, bore, displacement, launched)
+            AS
+            SELECT class, type, numGuns, bore, displacement, launched
+            FROM Classes, Ships
+            WHERE Classes.class = Ships.ship;
+        \end{minted}
+        \item[4)]\begin{minted}{SQL}
+            SELECT battle
+            FROM Ships, Outcomes
+            WHERE Ships.name = Outcomes.ship
+                AND Ships.class = "Kongo";
+        \end{minted}
+        \item[5)]\begin{minted}{SQL}
+            SELECT AVG(numGuns)
+            FROM Classes
+            WHERE type = "bb";
+        \end{minted}
+        \item[6)]\begin{minted}{SQL}
+            SELECT  MIN(launched)
+            FROM Classes, Ships
+            WHERE Classes.name = Ships.class;
+        \end{minted}
+        \item[7)]\begin{minted}{SQL}
+            SELECT Classes.class, COUNT(result)
+            FROM Classes, Ships, Outcomes
+            WHERE Classes.class = Ships.class
+                AND Ships.name = Outcomes.ship
+                AND Outcomes.result = "沉没"
+                AND Classes.class IN
+                (
+                    SELECT class
+                    FROM Classes, Ships, Outcomes
+                    WHERE Classes.class = Ships.ship
+                        AND Ships.name = Outcomes.ship
+                        GROUP BY Classes.class
+                        HAVING COUNT(Outcomes.ship) >= 3
+                );
+        \end{minted}
+        \item[8)]\begin{minted}{SQL}
+            SELECT name
+            FROM Ships
+            UNION
+            SELECT ship
+            FROM Outcomes;
+        \end{minted}
+        \item[9)]\begin{minted}{SQL}
+            SELECT country
+            FROM Classes
+            GROUP BY country HAVING COUNT(type) >= 2;
+        \end{minted}
+        \item[10)]\begin{minted}{SQL}
+            SELECT country
+            FROM Classes
+            WHERE numGuns >=
+                (
+                    SELECT MAX(numGuns)
+                    FROM Classes
+                );
+        \end{minted}
+        \item[11)]\begin{minted}{SQL}
+            SELECT Classes.class
+            FROM Classes, Ships, Outcomes
+            WHERE Classes.class = Ships.class
+                AND Ships.name = Outcomes.ship
+                AND Outcomes.result = "沉没"
+            GROUP BY Classes.class HAVING COUNT(*) >= 1;
+        \end{minted}
     \end{enumerate}
     \paragraph{三、}
+    \begin{enumerate}
+        \item[1)]\begin{minted}{SQL}
+            CREATE TABLE Orders
+            (
+                OrderID CHAR() PRIMARY KEY,
+                SupplierID CHAR(), 
+                MovieID CHAR(),
+                Copies INT,
+                FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID),
+                FOREIGN KEY (MovieID) REFERENCES Movies(MovieID)
+            );
+
+            CREATE TABLE Rentals
+            (
+                CustomerID CHAR(),
+                TapeID CHAR(),
+                CkoutDate DATE,
+                Duration INT,
+                PRIMARY KEY (CustomerID, TapeID, CkoutDate),
+                FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+                FOREIGN KEY (TapeID) REFERENCES Inventory(TapeID)
+            );
+        \end{minted}
+        \item[2)]\begin{enumerate}
+            \item[a.]\begin{minted}{SQL}
+                INSERT
+                INTO Rentals
+                VALUES("9823", "5600", 2017-03-26, 30);
+            \end{minted}
+        \end{enumerate}
+            \item[b.]\begin{minted}{SQL}
+                DELETE
+                FROM Rentals
+                WHERE CkoutDate < 2000-01-01;
+            \end{minted}
+            \item[c.]\begin{minted}{SQL}
+                UPDATE MovieSupplier
+                SET Price = Price / 6.88;
+            \end{minted}
+        \item[3)]\begin{minted}{SQL}
+            CREATE VIEW JHV_Suppliers (MovieName, Price)
+            AS
+            SELECT MovieName, Price
+            FROM Movies, Suppliers, MovieSupplier
+            WHERE Movies.MovieID = MovieSupplier.MovieID
+                AND Suppliers.SupplierID = MovieSupplier.SupplierID
+                AND Suppliers.SupplierName = "Joe's House of Video";
+        \end{minted}
+        \item[4)]\begin{minted}{SQL}
+            SELECT SupplierName, COUNT(MovieID)
+            FROM Inventory, Suppliers, MovieSupplier
+            WHERE Inventory.MovieID = MovieSupplier.MovieID
+                AND Suppliers.SupplierID = MovieSupplier.SupplierID
+            GROUP BY Suppliers.SupplierID;
+        \end{minted}
+        \item[5)]\begin{minted}{SQL}
+            SELECT MovieName
+            FROM Orders, Movies
+            WHERE Movies.MovieID = Orders.MovieID
+                AND Orders.Copies > 5;
+        \end{minted}
+        \item[6)]\begin{minted}{SQL}
+            SELECT MovieName
+            FROM Inventory, Movies
+            WHERE Movies.MovieID = Inventory.MovieID
+            GROUP BY Movies.MovieID HAVING COUNT(TapeID) > 1;
+        \end{minted}
+        \item[7)]\begin{minted}{SQL}
+            SELECT MovieName
+            FROM Movies, Inventory, Rentals
+            WHERE Movies.MovieID = Inventory.MovieID
+                AND Rentals.TapeID = Inventory.TapeID
+                AND Rentals.Duration >= 
+                (
+                    SELECT MAX(Duration)
+                    FROM Rentals
+                );
+        \end{minted}
+        \item[8)]\begin{minted}{SQL}
+            SELECT MovieName
+            FROM Movies
+            EXCEPT
+            SELECT MovieName
+            FROM Movies, Inventory
+            WHERE Movies.MovieID = Inventory.MovieID;
+        \end{minted}
+        \item[9)]\begin{minted}{SQL}
+            SELECT SupplierID, SupplierName
+            FROM Suppliers, MovieSupplier
+            WHERE Suppliers.SupplierID = MovieSupplier.MovieID
+                AND MovieSupplier.MovieID IN
+                (
+                    SELECT MovieID
+                    FROM Movies
+                    WHERE MovieName = "Hacksaw Ridge"
+                )
+                AND MovieSupplier.Price <=
+                (
+                    SELECT MIN(Price)
+                    FROM Movies, MovieSupplier
+                    WHERE Movies.MovieID = MovieSupplier.MovieID
+                        AND Movies.MovieName = "Hacksaw Ridge"
+                );
+        \end{minted}
+        \item[10)]\begin{minted}{SQL}
+            SELECT CustomerName
+            FROM Movies, Rentals, Inventory, Customers
+            WHERE Movies.MovieID = Inventory.MovieID
+                AND Rentals.TapeID = Inventory.TapeID
+                AND Customers.CustomerID = Rentals.CustomerID
+                AND Movies.MovieName = "Beauty and the Beast"
+            UNION
+            SELECT CustomerName
+            FROM Rentals, Inventory, MovieSupplier, Suppliers, Customers
+            WHERE Rentals.CustomerID = Customers.CustomerID
+                AND Inventory.TapeID = Rentals.TapeID
+                AND MovieSupplier.SupplierID = Suppliers.SupplierID
+                AND Inventory.MovieID = MovieSupplier.MovieID
+                AND Inventory.MovieID IN
+                (
+                    SELECT MovieID
+                    FROM MovieSupplier, Suppliers
+                    WHERE MovieSupplier.SupplierID = Suppliers.SupplierID
+                        AND Suppliers.SupplierName = "VWS Video"
+                );
+        \end{minted}
+    \end{enumerate}
     
 
 \end{document}
