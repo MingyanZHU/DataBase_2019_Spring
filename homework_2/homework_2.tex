@@ -85,7 +85,11 @@
             );
         \end{minted}
 
-        说明，主键可以唯一区分实体，外键\texttt{class}需要存在。
+        注意
+        \begin{itemize}
+            \item 在插入\texttt{Classes}时，主键\texttt{class}可以唯一区分实体;
+            \item 在插入\texttt{Ships}时，主键\texttt{name}可以唯一区分实体，并且外键\texttt{class}需要存在。
+        \end{itemize}
         \item[2)]\begin{itemize}
             \item[a.]\begin{minted}{SQL}
                 INSERT 
@@ -143,20 +147,18 @@
             WHERE Classes.name = Ships.class;
         \end{minted}
         \item[7)]\begin{minted}{SQL}
-            SELECT Classes.class, COUNT(result)
-            FROM Classes, Ships, Outcomes
-            WHERE Classes.class = Ships.class
-                AND Ships.name = Outcomes.ship
+            SELECT class, COUNT(result)
+            FROM Ships, Outcomes
+            WHERE Ships.name = Outcomes.ship
                 AND Outcomes.result = "沉没"
-                AND Classes.class IN
+                AND class IN
                 (
                     SELECT class
-                    FROM Classes, Ships, Outcomes
-                    WHERE Classes.class = Ships.ship
-                        AND Ships.name = Outcomes.ship
-                        GROUP BY Classes.class
-                        HAVING COUNT(Outcomes.ship) >= 3
-                );
+                    FROM Ships, Outcomes
+                    WHERE Ships.name = Outcomes.ship
+                        GROUP BY class HAVING COUNT(*) >= 3
+                )
+                GROUP BY class;
         \end{minted}
         \item[8)]\begin{minted}{SQL}
             SELECT name
