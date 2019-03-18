@@ -130,6 +130,7 @@ public class Main {
                 int address = random.nextInt(locationList.size());
                 employeeList.add(new Employee(values[0], values[1].replaceAll("\\s", ""), locationList.get(address)
                         , "", random.nextInt(MAX_SALARY) + BASE_SALARY, random.nextInt(departmentList.size()) + 1));
+
             }
             bufferedWriter.close();
         } catch (IOException e) {
