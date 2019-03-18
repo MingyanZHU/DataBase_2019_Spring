@@ -67,7 +67,7 @@
             CREATE TABLE Classes
             (
                 class CHAR(20) PRIMARY KEY,
-                type CHAR(2),
+                type CHAR(2) NOT NULL,
                 country CHAR(15),
                 numGuns SMALLINT,
                 bore, SMALLINT,
@@ -112,7 +112,7 @@
                     SELECT
                     FROM Ships, Outcomes
                     WHERE Ships.name = Outcomes.ship
-                        AND Outcomes.result = "沉没"
+                        AND Outcomes.result = "sunk"
                 );
             \end{minted}
             \item[c.]\begin{minted}{SQL}
@@ -128,7 +128,8 @@
             AS
             SELECT class, type, numGuns, bore, displacement, launched
             FROM Classes, Ships
-            WHERE Classes.class = Ships.ship;
+            WHERE Classes.class = Ships.ship
+                AND country = "Gt.Britain";
         \end{minted}
         \item[4)]\begin{minted}{SQL}
             SELECT battle
@@ -144,13 +145,14 @@
         \item[6)]\begin{minted}{SQL}
             SELECT  MIN(launched)
             FROM Classes, Ships
-            WHERE Classes.name = Ships.class;
+            WHERE Classes.class = Ships.class
+            GROUP BY Classes.class;
         \end{minted}
         \item[7)]\begin{minted}{SQL}
             SELECT class, COUNT(result)
             FROM Ships, Outcomes
             WHERE Ships.name = Outcomes.ship
-                AND Outcomes.result = "沉没"
+                AND Outcomes.result = "sunk"
                 AND class IN
                 (
                     SELECT class
@@ -175,9 +177,9 @@
         \item[10)]\begin{minted}{SQL}
             SELECT country
             FROM Classes
-            WHERE numGuns >=
+            WHERE numGuns >= ALL
                 (
-                    SELECT MAX(numGuns)
+                    SELECT numGuns
                     FROM Classes
                 );
         \end{minted}
@@ -186,7 +188,7 @@
             FROM Classes, Ships, Outcomes
             WHERE Classes.class = Ships.class
                 AND Ships.name = Outcomes.ship
-                AND Outcomes.result = "沉没"
+                AND Outcomes.result = "sunk"
             GROUP BY Classes.class HAVING COUNT(*) >= 1;
         \end{minted}
     \end{enumerate}
@@ -195,9 +197,9 @@
         \item[1)]\begin{minted}{SQL}
             CREATE TABLE Orders
             (
-                OrderID CHAR() PRIMARY KEY,
-                SupplierID CHAR(), 
-                MovieID CHAR(),
+                OrderID CHAR(20) PRIMARY KEY,
+                SupplierID CHAR(20), 
+                MovieID CHAR(20),
                 Copies INT,
                 FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID),
                 FOREIGN KEY (MovieID) REFERENCES Movies(MovieID)
@@ -205,8 +207,8 @@
 
             CREATE TABLE Rentals
             (
-                CustomerID CHAR(),
-                TapeID CHAR(),
+                CustomerID CHAR(20),
+                TapeID CHAR(20),
                 CkoutDate DATE,
                 Duration INT,
                 PRIMARY KEY (CustomerID, TapeID, CkoutDate),
@@ -250,7 +252,8 @@
             SELECT MovieName
             FROM Orders, Movies
             WHERE Movies.MovieID = Orders.MovieID
-                AND Orders.Copies > 5;
+                AND SUM(Orders.Copies) > 5
+            GROUP BY Orders.MovieID;
         \end{minted}
         \item[6)]\begin{minted}{SQL}
             SELECT MovieName
@@ -263,9 +266,9 @@
             FROM Movies, Inventory, Rentals
             WHERE Movies.MovieID = Inventory.MovieID
                 AND Rentals.TapeID = Inventory.TapeID
-                AND Rentals.Duration >= 
+                AND Rentals.Duration >= ALL 
                 (
-                    SELECT MAX(Duration)
+                    SELECT Duration
                     FROM Rentals
                 );
         \end{minted}
@@ -287,9 +290,9 @@
                     FROM Movies
                     WHERE MovieName = "Hacksaw Ridge"
                 )
-                AND MovieSupplier.Price <=
+                AND MovieSupplier.Price <= ALL
                 (
-                    SELECT MIN(Price)
+                    SELECT Price
                     FROM Movies, MovieSupplier
                     WHERE Movies.MovieID = MovieSupplier.MovieID
                         AND Movies.MovieName = "Hacksaw Ridge"
