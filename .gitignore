@@ -244,4 +244,7 @@ TSWLatexianTemp*
 # JetBrains idea
 .idea/
 *.iml
+out/
 
+# JAVA 
+*.class
