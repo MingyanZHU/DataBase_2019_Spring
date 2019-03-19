@@ -1,5 +1,5 @@
 \documentclass{ML}
-
+\usepackage{float}
 % 姓名，学号
 \infoauthor{朱明彦}{1160300314}
 
@@ -179,10 +179,62 @@ MySQL 数据库。掌握 SQL 语言的使用方法,学会使用 SQL 语言进行
     \end{figure}
 \end{enumerate}
 \subsection{关系数据库COMPANY介绍}
-
+\paragraph{表EMPLOYEE} 其模式如图\ref{fig:emp_pattern}所示，其中\texttt{ESSN}即雇员的身份证号为主键，\texttt{SUPERSSN}即雇员直接上司的身份证号为相对其自身的外键；
+对于\texttt{DNO}即雇员所属的部门编号为相对于\texttt{DEPARTMENT}中\texttt{DNO}的外键。
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.5, bb=0 0 639 242]{media/employee_pattern.eps}
+    \caption{TABLE EMPLOYEE PATTERN}\label{fig:emp_pattern}
+\end{figure}
+\paragraph{表DEPARTMENT} 其模式如图\ref{fig:dep_pattern}所示，其中\texttt{DNO}即部门编号为主键，\texttt{MGRSSN}即部门领导的身份证号为相对于\texttt{EMPLOYEE}的\texttt{ESSN}的外键。
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.5, bb=0 0 682 196]{media/department_pattern.eps}
+    \caption{TABLE DEPARTMENT PATTERN}\label{fig:dep_pattern}
+\end{figure}
+\paragraph{表PROJECT} 其模式如图\ref{fig:pro_pattern}所示，其中\texttt{PRO}即工程编号为主键，\texttt{DNO}即所属部门的编号为相对于\texttt{DEPARTMENT}的\texttt{DNO}的外键。
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.5, bb=0 0 645 236]{media/project_pattern.eps}
+    \caption{TABLE PROJECT PATTERN}\label{fig:pro_pattern}
+\end{figure}
+\paragraph{表WORKS\_ON} 其模式如图\ref{fig:works_pattern}所示，其中\texttt{ESSN, PNO}为主键。
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.5, bb=0 0 566 181]{media/works_on_pattern.eps}
+    \caption{TABLE WORKS\_ON PATTERN}\label{fig:works_pattern}
+\end{figure}
 \subsection{数据准备}
+\paragraph{表EMPLOYEE} 其共包含89条不同的员工信息，此处仅仅截取了部分信息，如图\ref{fig:employee}所示
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.3, bb = 0 0 1487 836]{media/employee.eps}
+    \caption{TABLE EMPLOYEE}\label{fig:employee}
+\end{figure}
+\paragraph{表DEPARTMENT} 其共包含9条不同的部门信息，如图\ref{fig:department}所示。
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.5, bb = 0 0 789 307]{media/department.eps}
+    \caption{TABLE DEPARTMENT}\label{fig:department}
+\end{figure}
+\paragraph{表PROJECT} 其共包含11条不同的工程信息，如图\ref{fig:project}所示。
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale = 0.25, bb = 0 0 1698 356]{media/project.eps}
+    \caption{TABLE PROJECT}\label{fig:project}
+\end{figure}
+\paragraph{表WORKS\_ON} 其共包含了204条不同的工作信息，此处仅仅截取了部分信息，如图\ref{fig:works_on}所示。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.5, bb = 0 0 419 375]{media/works_ON.eps}
+    \caption{TABLE WORKS\_ON}\label{fig:works_on}
+\end{figure}
+
 
 \section{实验心得}
+
+对于本次实验，准备实验中所需的数据花费了比较多的时间，另外对于如何具体使用MySQL有了比较新的认识，但总体来说实验难度不大。
 
 % \appendix
 
