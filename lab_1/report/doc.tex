@@ -28,12 +28,160 @@ MySQL 数据库。掌握 SQL 语言的使用方法,学会使用 SQL 语言进行
     \item MySQL Ver 14.14 Distrib 5.7.25
 \end{itemize}
 \section{实验过程及结果}
-对报告中第 3 部分的实验结果进行截图,作为评分标准。对于 3.2,使用
-MYSQL 基本命令可以查看创建的关系数据库的每个模式(参看第 4 部分 MYSQL
-手册,做作业之前先练习第 4 部分有助于熟悉 MYSQL 命令),对结果进行截图。
-对于 3.3,使用 select *语句分别显示每张表中被添加的数据,对结果进行截图。
-对于 3.1,在你完成 3.2 和 3.3 之后,把输入的 9 条 sql 语句和相应的查询结果截
-图显示,所以你设计的数据库必须包括 3.1 需要的各种数据。
+% 对报告中第 3 部分的实验结果进行截图,作为评分标准。对于 3.2,使用
+% MYSQL 基本命令可以查看创建的关系数据库的每个模式(参看第 4 部分 MYSQL
+% 手册,做作业之前先练习第 4 部分有助于熟悉 MYSQL 命令),对结果进行截图。
+% 对于 3.3,使用 select *语句分别显示每张表中被添加的数据,对结果进行截图。
+% 对于 3.1,在你完成 3.2 和 3.3 之后,把输入的 9 条 sql 语句和相应的查询结果截
+% 图显示,所以你设计的数据库必须包括 3.1 需要的各种数据。
+\subsection{实验任务}
+\begin{enumerate}
+    \item 参加了项目名为"SQL Project"的员工的名字；
+    \begin{minted}{SQL}
+    SELECT ENAME
+    FROM EMPLOYEE, WORKS_ON, PROJECT
+    WHERE EMPLOYEE.ESSN = WORKS_ON.ESSN AND WORKS_ON.PNO = PROJECT.PNO
+        AND PROJECT.PNAME = "SQL Project";
+    \end{minted}
+    SQL查询结果如图\ref{fig:1}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 148 495]{media/3.1.1.eps}
+        \caption{}\label{fig:1}
+    \end{figure}
+    \item 在"Research Department"工作且工资低于3000元的员工名字和地址；
+    \begin{minted}{SQL}
+    SELECT ENAME, ADDRESS
+    FROM EMPLOYEE, DEPARTMENT
+    WHERE EMPLOYEE.DNO = DEPARTMENT.DNO 
+        AND DEPARTMENT.DNAME = "Research Department"
+        AND SALARY < 3000;
+    \end{minted}
+    SQL查询结果如图\ref{fig:2}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.5, bb=0 0 815 146]{media/3.1.2.eps}
+        \caption{}\label{fig:2}
+    \end{figure}
+    \item 没有参加项目编号为P1的项目的员工名字；
+    \begin{minted}{SQL}
+    SELECT DISTINCT ENAME
+    FROM EMPLOYEE
+    WHERE ENAME NOT IN(
+        SELECT DISTINCT ENAME
+        FROM EMPLOYEE, WORKS_ON
+        WHERE WORKS_ON.ESSN = EMPLOYEE.ESSN AND WORKS_ON.PNO = "P1"
+    );
+    \end{minted}
+
+    SQL查询结果如图\ref{fig:3}，但由于总的查询结果有70条，故此处仅列出部分查询结果。
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 147 726]{media/3.1.3.eps}
+        \caption{}\label{fig:3}
+    \end{figure}
+    \item 由张红领导的工作人员的姓名和所在部门；
+    \begin{minted}{SQL}
+    SELECT ENAME, DNAME
+    FROM DEPARTMENT, EMPLOYEE
+    WHERE EMPLOYEE.DNO = DEPARTMENT.DNO 
+        AND EMPLOYEE.SUPERSSN IN(
+            SELECT ESSN
+            FROM EMPLOYEE
+            WHERE ENAME = "张红"
+        );
+    \end{minted}
+    SQL查询结果如图\ref{fig:4}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 383 124]{media/3.1.4.eps}
+        \caption{}\label{fig:4}
+    \end{figure}
+    \item 至少参加了项目编号为P1和P2的项目的员工号；
+    \begin{minted}{SQL}
+    SELECT DISTINCT ESSN
+    FROM WORKS_ON
+    WHERE PNO = "P1" 
+    AND ESSN IN(
+        SELECT DISTINCT ESSN
+        FROM WORKS_ON
+        WHERE PNO = "P2"
+    );
+    \end{minted}
+    SQL查询结果如图\ref{fig:5}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 245 142]{media/3.1.5.eps}
+        \caption{}\label{fig:5}
+    \end{figure}
+    \item 参加了全部项目的员工号码和姓名；
+    \begin{minted}{SQL}
+    SELECT DISTINCT R1.ESSN, ENAME 
+    FROM WORKS_ON R1, EMPLOYEE
+    WHERE NOT EXISTS(
+        SELECT PROJECT.PNO FROM PROJECT
+        WHERE NOT EXISTS(
+            SELECT * FROM WORKS_ON R2
+            WHERE R2.ESSN = R1.ESSN AND R2.PNO = PROJECT.PNO
+        )
+    ) AND R1.ESSN = EMPLOYEE.ESSN;
+    \end{minted}
+    SQL查询结果如图\ref{fig:6}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 383 103]{media/3.1.6.eps}
+        \caption{}\label{fig:6}
+    \end{figure}
+    \item 员工平均工资低于3000元的部门名称；
+    \begin{minted}{SQL}
+    SELECT DNAME
+    FROM DEPARTMENT, EMPLOYEE
+    WHERE DEPARTMENT.DNO = EMPLOYEE.DNO
+    GROUP BY DEPARTMENT.DNO
+    HAVING AVG(SALARY) < 3000;
+    \end{minted}
+    SQL查询结果如图\ref{fig:7}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 311 210]{media/3.1.7.eps}
+        \caption{}\label{fig:7}
+    \end{figure}
+    \item 至少参与了3个项目且工作总时间不超过8小时的员工名字；
+    \begin{minted}{SQL}
+    SELECT ENAME FROM EMPLOYEE
+    WHERE ESSN IN(
+        SELECT ESSN
+        FROM WORKS_ON
+        GROUP BY ESSN HAVING COUNT(PNO) >= 3 AND SUM(HOURS) <= 8
+    );
+    \end{minted}
+    SQL查询结果如图\ref{fig:8}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 148 100]{media/3.1.8.eps}
+        \caption{}\label{fig:8}
+    \end{figure}
+    \item 每个部门员工小时平均工资；
+    \begin{minted}{SQL}
+    SELECT DNAME, AVG(SALARY / R.sum) HOURS_SALARY
+    FROM EMPLOYEE, (
+        SELECT ESSN, SUM(HOURS) sum
+        FROM WORKS_ON
+        GROUP BY WORKS_ON.ESSN) AS R, DEPARTMENT
+    WHERE R.ESSN = EMPLOYEE.ESSN AND EMPLOYEE.DNO = DEPARTMENT.DNO
+    GROUP BY DEPARTMENT.DNO;
+    \end{minted}
+    SQL查询结果如图\ref{fig:9}
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.4, bb=0 0 474 274]{media/3.1.9.eps}
+        \caption{}\label{fig:9}
+    \end{figure}
+\end{enumerate}
+\subsection{关系数据库COMPANY介绍}
+
+\subsection{数据准备}
+
 \section{实验心得}
 
 % \appendix

@@ -17,7 +17,7 @@ class Employee {
 
     @Override
     public String toString() {
-        return ename + "\t" + essn + "\t" + address + "\t" + super_ssn + "\t" + salary + "\t" + dno;
+        return ename + "\t" + essn + "\t" + address + "\t" + salary + "\t" + super_ssn + "\t" + dno;
     }
 }
 
@@ -40,9 +40,10 @@ class Department {
 
 class Project {
     String pname, plocation;
-    int pno, dno;
+    String pno;
+    int dno;
 
-    public Project(String pname, String plocation, int pno, int dno) {
+    public Project(String pname, String plocation, String pno, int dno) {
         this.pname = pname;
         this.plocation = plocation;
         this.pno = pno;
@@ -57,9 +58,10 @@ class Project {
 
 class Works_on {
     String essn;
-    int pno, hours;
+    int hours;
+    String pno;
 
-    public Works_on(String essn, int pno, int hours) {
+    public Works_on(String essn, String pno, int hours) {
         this.essn = essn;
         this.pno = pno;
         this.hours = hours;
@@ -103,7 +105,7 @@ public class Main {
             int count = 0;
             while ((s = bufferedReader.readLine()) != null) {
                 String[] values = s.split(" ");
-                projectList.add(new Project(values[0].replace("_", " "), values[1], ++count, random.nextInt(departmentList.size()) + 1));
+                projectList.add(new Project(values[0].replace("_", " "), values[1], "P" + String.valueOf(++count), random.nextInt(departmentList.size()) + 1));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -114,7 +116,7 @@ public class Main {
             BufferedReader bufferedReader = new BufferedReader(new FileReader("./source_file/employee_location.txt"));
             String s;
             while ((s = bufferedReader.readLine()) != null) {
-                locationList.add(s);
+                locationList.add(s.replaceAll("\\s", ""));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,12 +149,15 @@ public class Main {
         }
 
 
-        Works_on[] works_ons = new Works_on[employeeList.size()];
-        int count = 0;
+        List<Works_on> works_ons = new ArrayList<>();
         for (Employee employee : employeeList) {
-            int hours = 6 + random.nextInt(6);
-            int pid = random.nextInt(projectList.size());
-            works_ons[count++] = new Works_on(employee.essn, projectList.get(pid).pno, hours);
+            int projects_person = random.nextInt(4) + 1;
+            for (int i = 0; i < projects_person; i++) {
+                // 利用PRIMARY KEY 删除重复
+                int hours = random.nextInt(8);
+                int pid = random.nextInt(projectList.size());
+                works_ons.add(new Works_on(employee.essn, projectList.get(pid).pno, hours));
+            }
         }
 
         try {
