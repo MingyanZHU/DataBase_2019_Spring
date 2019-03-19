@@ -33,7 +33,7 @@
             WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.S# = "003";
         \end{minted}
         \item[2)]\begin{minted}{SQL}
-            SELECT SNAME
+            SELECT DISTINCT SNAME
             FROM S, C, SC
             WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.AGE = "男"
                  AND C.TEACHER = "程军";
@@ -41,10 +41,11 @@
         \item[3)]\begin{minted}{SQL}
             SELECT CNAME
             FROM C
-            EXCEPT
-            SELECT CNAME
-            FROM S, C, SC
-            WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.SNAME = "刘丽";
+            WHERE CNAME NOT IN(
+                SELECT DISTINCT CNAME
+                FROM S, C, SC
+                WHERE S.S# = SC.S# AND C.C# = SC.C# AND S.SNAME = "刘丽";
+            )
         \end{minted}
         \item[4)]\begin{minted}{SQL}
             SELECT S#, SNAME
@@ -226,7 +227,7 @@
             \item[b.]\begin{minted}{SQL}
                 DELETE
                 FROM Rentals
-                WHERE CkoutDate < 2000-01-01;
+                WHERE CkoutDate < '2000-01-01';
             \end{minted}
             \item[c.]\begin{minted}{SQL}
                 UPDATE MovieSupplier
@@ -273,12 +274,13 @@
                 );
         \end{minted}
         \item[8)]\begin{minted}{SQL}
-            SELECT MovieName
+            SELECT DISTINCT MovieName
             FROM Movies
-            EXCEPT
-            SELECT MovieName
-            FROM Movies, Inventory
-            WHERE Movies.MovieID = Inventory.MovieID;
+            WHERE MovieName NOT IN(
+                SELECT DISTINCT MovieName
+                FROM Movies, Inventory
+                WHERE Movies.MovieID = Inventory.MovieID;
+            )
         \end{minted}
         \item[9)]\begin{minted}{SQL}
             SELECT SupplierID, SupplierName
