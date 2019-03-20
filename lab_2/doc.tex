@@ -28,9 +28,30 @@
     \item Ubuntu 16.04.5
     \item MySQL Ver 14.14 Distrib 5.7.25
     \item Java version 1.8.0\_181
+    \item IntelliJ IDEA Ultimate 2018.3.5
 \end{itemize}
 \section{实验过程及结果}
-
+\begin{enumerate}
+    \item \begin{minted}{Java}
+    String PARA_PNO = "%PNO%";
+    String query = "SELECT ESSN FROM WORKS_ON WHERE PNO = \"" + PARA_PNO + "\"";
+    System.out.println("Query " + count);
+    System.out.println("Please input pno:");
+    String pno = cin.nextLine();
+    query = query.replace(PARA_PNO, pno);
+    resultSet = statement.executeQuery(query);
+    while (resultSet.next())
+        System.out.println(resultSet.getNString("ESSN"));
+    \end{minted}
+    实验结果如下：
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.5, bb=0 0 217 485]{media/3.1.eps}
+    \end{figure}
+    % \begin{minted}
+        
+    % \end{minted}
+\end{enumerate}
 \section{实验心得}
 
 % \appendix
