@@ -14,7 +14,7 @@
     \geometry{left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}  %设置 上、左、下、右 页边距
 	\begin{document}
 	\newpagestyle{main}{            
-		\sethead{哈尔滨工业大学}{数据库系统\_第一次作业}{1160300314 朱明彦}     %设置页眉
+		\sethead{哈尔滨工业大学}{数据库系统\_第三次作业}{1160300314 朱明彦}     %设置页眉
 		% \setfoot{左页脚}{中页脚}{右页脚}      %设置页脚，可以在页脚添加 \thepage  显示页数
 		\setfoot{}{}{\thepage}
 		\headrule                                      % 添加页眉的下划线
@@ -48,70 +48,137 @@
 	\paragraph{二、}
 	\begin{center}
 		\scalebox{0.75}{
+				\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+			
+					\node[entity] (customer) {顾客};
+					\node[attribute] (cname) [above=of customer] {姓名} edge (customer);
+					\node[attribute] (cid) [above left=of customer] {\key{社会安全号码}} edge (customer);
+	
+					\node[relationship] (have) [below=of customer] {拥有} edge node[auto] {1} (customer);
+					\node[entity] (address) [below left=of have] {地址} edge node[auto] {m} (have);
+					\node[attribute] (state) [left=of address] {\key{州名}} edge (address);
+					\node[attribute] (city) [above left=of address] {\key{城市}} edge (address);
+					\node[attribute] (street) [below left=of address] {\key{街道}} edge (address);
+	
+					\node[entity] (telephone) [below=of have] {电话} edge node[auto] {n} (have);
+					\node[attribute] (telephone_number) [below=of telephone] {\key{电话号码}} edge (telephone);
+	
+					\node[relationship] (own) [right=of have] {持有} edge node[auto] {1} (customer);
+					\node[entity] (account) [below=of own] {账户} edge node[auto] {n} (own);
+	
+					\node[attribute] (acc_id) [above right=of account] {\key{号码}} edge (account);
+					\node[attribute] (type) [right=of account] {类型} edge (account);
+					\node[attribute] (incomde) [below right=of account] {收支情况} edge (account);
+					% \node[isa] (isa) [below=1cm of emp] {ISA} edge (emp);
+				  
+					% \node[entity] (mec) [below left=1cm of isa] {Mechanic} edge (isa);
+					% \node[entity] (sal) [below right=1cm of isa] {Salesman} edge (isa);
+				  
+					% \node[relationship] (does) [left=of mec] {Does} edge (mec);
+				  
+					% \node[weak entity] (rep) [below=of does] {RepairJob} edge (does);
+					% \node[attribute] (rnum) [left=of rep] {\discriminator{Number}} edge (rep);
+					% \node[attribute] (desc) [above left=of rep] {Description} edge (rep);
+					% \node[attribute] (cost) [below left=of rep] {Cost} edge (rep);
+					% \node[attribute] (mat) [left=0.5cm of cost] {Parts} edge (cost);
+					% \node[attribute] (work) [below left=0.5cm of cost] {Work} edge (cost);
+				  
+					% \node[ident relationship] (reps) [below=of rep] {Repairs} edge [total] (rep);
+				  
+					% \node[entity] (car) [right=of reps] {Car} edge [<-] (reps);
+					% \node[attribute] (lic) [above=of car] {\key{License}} edge (car);
+					% \node[attribute] (mod) [below=of car] {Model} edge (car);
+					% \node[attribute] (year) [below right=of car] {Year} edge (car);
+					% \node[attribute] (manu) [below left=1.5cm of car] {Manufacturer} edge (car);
+					
+					% \node[relationship] (buy) [below=of sal] {Buys};
+					% \node[attribute] (pri) [above left=of buy] {Price} edge (buy);
+					% \node[attribute] (sdate) [left=of buy] {Date} edge (buy);
+					% \node[attribute] (bval) [below left=of buy] {Value} edge (buy);
+				  
+					% \node[relationship] (sel) [right=of buy] {Sells};
+					% \node[attribute] (sdate) [above right=of sel] {Date} edge (sel);
+					% \node[derived attribute] (sval) [right=of sel] {Value} edge (sel);
+					% \node[attribute] (com) [below right=of sel] {Comission} edge (sel);
+					
+					% \draw[link] (car.10) -| (buy) (buy) edge (sal);
+					% \draw[link] (car.-10) -| (sel) (sel) |- (sal);
+				  
+					% \node[entity] (cli) [below right=0.5cm and 3.7cm of car] {Client};
+					% \node[attribute] (cid) [right=of cli] {\key{ID}} edge (cli);
+					% \node[attribute] (cname) [below left=of cli] {Name} edge (cli);
+					% \node[multi attribute] (cphone) [below right=of cli] {Phone} edge (cli);
+					% \node[attribute] (cadd) [below=of cli] {Address} edge (cli);
+				  
+					% \draw[link] (cli.70) |- node [pos=0.05, auto, swap] {buyer} (sel);
+					% \draw[link] (cli.110) |- node [pos=0.05, auto] {seller} (buy);
+				  
+				  \end{tikzpicture}	  
+			}
+	
+		\end{center}
+	\begin{enumerate} 
+		\item ER图如上所示。
+		\item 转化得到的关系模式如下所示：
+		\begin{itemize}
+			\item \texttt{顾客(\underline{社会安全号码}，姓名)}
+			\item \texttt{顾客地址电话(\underline{社会安全号码}，\underline{城市}，\underline{州名}，\underline{街道}， \underline{电话号码})}
+			\item \texttt{账户(\underline{号码}，类型，收支情况)}
+			\item \texttt{顾客账户(\underline{社会安全号码}，\underline{号码})}
+		\end{itemize}
+		\item \begin{enumerate}
+			\item 对于顾客表，其主键为社会安全号码。
+			\item 对于顾客地址电话表，其主键为社会安全号码，城市，州名，街道和电话号码，外键为社会安全号码相对于顾客表。
+			\item 对于账户表，其主键为号码。
+			\item 对于顾客账户表，其主键为社会安全号码和号码，外键为社会安全号码相对与顾客表。
+		\end{enumerate}
+	\end{enumerate}
+	\newpage
+    \paragraph{三、}
+	\begin{center}
+		\scalebox{0.75}{
 			\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
-		
-				\node[entity] (customer) {顾客};
-				\node[attribute] (cname) [above=of customer] {姓名} edge (customer);
-				\node[attribute] (cid) [above left=of customer] {\key{社会安全号码}} edge (customer);
+			
+				\node[relationship] (sale) {销售};
+				\node[attribute] (month_sales) [above=of sale] {月销售量} edge (sale);
+				\node[entity] (shop) [left=of sale]{商店} edge node[above] {m} (sale);
+				\node[entity] (goods) [right=of sale] {商品} edge node[above] {n} (sale);
 
-				\node[relationship] (have) [below=of customer] {拥有} edge node[auto] {1} (customer);
-				\node[entity] (address) [below left=of have] {地址} edge node[auto] {m} (have);
-				\node[attribute] (state) [left=of address] {\key{州名}} edge (address);
-				\node[attribute] (city) [above left=of address] {\key{城市}} edge (address);
-				\node[attribute] (street) [below left=of address] {\key{街道}} edge (address);
+				\node[attribute] (s_id) [above left=of shop] {\key{商店编号}} edge (shop);
+				\node[attribute] (s_name) [left=of shop] {商店名} edge (shop);
+				\node[attribute] (s_add) [below left=of shop] {地址} edge (shop);
+				\node[attribute] (g_id) [above right=of goods] {\key{商品号}} edge (goods);
+				\node[attribute] (g_name) [right=of goods] {商品名} edge (goods);
+				\node[attribute] (g_size) [below right=of goods] {规格} edge (goods);
+				\node[attribute] (g_prize) [below=of g_size] {单价} edge (goods);
 
-				\node[entity] (telephone) [below right=of have] {电话} edge node[auto] {n} (have);
-				\node[attribute] (telephone_number) [right=of telephone] {\key{电话号码}} edge (telephone);
-			  
-				% \node[isa] (isa) [below=1cm of emp] {ISA} edge (emp);
-			  
-				% \node[entity] (mec) [below left=1cm of isa] {Mechanic} edge (isa);
-				% \node[entity] (sal) [below right=1cm of isa] {Salesman} edge (isa);
-			  
-				% \node[relationship] (does) [left=of mec] {Does} edge (mec);
-			  
-				% \node[weak entity] (rep) [below=of does] {RepairJob} edge (does);
-				% \node[attribute] (rnum) [left=of rep] {\discriminator{Number}} edge (rep);
-				% \node[attribute] (desc) [above left=of rep] {Description} edge (rep);
-				% \node[attribute] (cost) [below left=of rep] {Cost} edge (rep);
-				% \node[attribute] (mat) [left=0.5cm of cost] {Parts} edge (cost);
-				% \node[attribute] (work) [below left=0.5cm of cost] {Work} edge (cost);
-			  
-				% \node[ident relationship] (reps) [below=of rep] {Repairs} edge [total] (rep);
-			  
-				% \node[entity] (car) [right=of reps] {Car} edge [<-] (reps);
-				% \node[attribute] (lic) [above=of car] {\key{License}} edge (car);
-				% \node[attribute] (mod) [below=of car] {Model} edge (car);
-				% \node[attribute] (year) [below right=of car] {Year} edge (car);
-				% \node[attribute] (manu) [below left=1.5cm of car] {Manufacturer} edge (car);
-				
-				% \node[relationship] (buy) [below=of sal] {Buys};
-				% \node[attribute] (pri) [above left=of buy] {Price} edge (buy);
-				% \node[attribute] (sdate) [left=of buy] {Date} edge (buy);
-				% \node[attribute] (bval) [below left=of buy] {Value} edge (buy);
-			  
-				% \node[relationship] (sel) [right=of buy] {Sells};
-				% \node[attribute] (sdate) [above right=of sel] {Date} edge (sel);
-				% \node[derived attribute] (sval) [right=of sel] {Value} edge (sel);
-				% \node[attribute] (com) [below right=of sel] {Comission} edge (sel);
-				
-				% \draw[link] (car.10) -| (buy) (buy) edge (sal);
-				% \draw[link] (car.-10) -| (sel) (sel) |- (sal);
-			  
-				% \node[entity] (cli) [below right=0.5cm and 3.7cm of car] {Client};
-				% \node[attribute] (cid) [right=of cli] {\key{ID}} edge (cli);
-				% \node[attribute] (cname) [below left=of cli] {Name} edge (cli);
-				% \node[multi attribute] (cphone) [below right=of cli] {Phone} edge (cli);
-				% \node[attribute] (cadd) [below=of cli] {Address} edge (cli);
-			  
-				% \draw[link] (cli.70) |- node [pos=0.05, auto, swap] {buyer} (sel);
-				% \draw[link] (cli.110) |- node [pos=0.05, auto] {seller} (buy);
-			  
+				\node[relationship] (work) [below=of sale] {聘用} edge node[auto] {1} (shop);
+				\node[attribute] (work_longth) [left=of work] {聘期} edge (work);
+				\node[attribute] (salary) [right=of work] {月薪} edge (work);
+				\node[entity] (worker) [below=of work] {职工} edge node[auto] {n} (work);
+
+				\node[attribute] (w_id) [left=of worker] {\key{职工编号}} edge (worker);
+				\node[attribute] (w_name) [below left=of worker] {姓名} edge (worker);
+				\node[attribute] (w_sex) [below right=of worker] {性别} edge (worker);
+				\node[attribute] (w_sale) [right=of worker] {业绩} edge (worker);
 			  \end{tikzpicture}	  
 		}
 	\end{center}
-    % \paragraph{四、}
-    % \paragraph{三、}
-    
+	\begin{enumerate}
+		\item ER图如上所示。
+		\item 将ER图转换为关系模式，如下所示
+		\begin{enumerate}
+			\item \texttt{商店(\underline{商店编号}, 商店名, 地址)}
+			\item \texttt{商品(\underline{商品号}, 商品名, 规格, 单价)}
+			\item \texttt{职工(\underline{职工编号}, \underline{商店编号}, 姓名, 性别, 业绩, 月薪, 聘期)}
+			\item \texttt{销售量(\underline{商店编号}, \underline{商品号}, 月销售量)}
+		\end{enumerate}
+		\item \begin{enumerate}
+			\item 对于商店表，主键为商店编号。
+			\item 对于商品表，主键为商品号。
+			\item 对于职工表，主键为商店编号和职工编号, 其外键为商店编号相对于商店表。
+			\item 对于销售量， 主键为商店编号和商品号。
+		\end{enumerate}
+	\end{enumerate}
 
 \end{document}
