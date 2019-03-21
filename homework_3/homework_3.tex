@@ -124,13 +124,13 @@
 		\item 转化得到的关系模式如下所示：
 		\begin{itemize}
 			\item \texttt{顾客(\underline{社会安全号码}，姓名，电话)}
-			\item \texttt{顾客地址电话(\underline{社会安全号码}，\underline{城市}，\underline{州名}，\underline{街道}， \underline{电话号码})}
+			\item \texttt{顾客地址电话(\underline{社会安全号码}，\underline{城市}，\underline{州名}，\underline{街道}， \underline{地址.电话})}
 			\item \texttt{账户(\underline{号码}，类型，收支情况)}
 			\item \texttt{顾客账户(\underline{社会安全号码}，\underline{号码})}
 		\end{itemize}
 		\item \begin{enumerate}
 			\item 对于顾客表，其主键为社会安全号码。
-			\item 对于顾客地址电话表，其主键为社会安全号码，城市，州名，街道和电话号码，外键为社会安全号码相对于顾客表。
+			\item 对于顾客地址电话表，其主键为社会安全号码，城市，州名，街道和地址.电话，外键为社会安全号码相对于顾客表。
 			\item 对于账户表，其主键为号码。
 			\item 对于顾客账户表，其主键为社会安全号码和号码，外键为社会安全号码相对与顾客表。
 		\end{enumerate}
