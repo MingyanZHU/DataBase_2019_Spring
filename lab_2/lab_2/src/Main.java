@@ -9,8 +9,8 @@ public class Main {
 
     private static final String PARA_PNO = "%PNO%";
     private static final String PARA_SALARY = "%SALARY%";
-    private static final String PARA_PNAME = "%PNAME";
-    private static final String PARA_DNAME = "%DNAME";
+    private static final String PARA_PNAME = "%PNAME%";
+    private static final String PARA_DNAME = "%DNAME%";
     private static final String PARA_ENAME = "%ENAME%";
     private static final String PARA_N = "%N%";
     private static final String PARA_HOURS = "%HOURS%";
@@ -135,7 +135,7 @@ public class Main {
                 System.out.println("Please input n:");
                 int n = Integer.parseInt(cin.nextLine());
                 query = query.replace(PARA_N, String.valueOf(n));
-                System.out.println("Please input salary:");
+                System.out.println("Please input hours:");
                 int hours = Integer.parseInt(cin.nextLine());
                 query = query.replace(PARA_HOURS, String.valueOf(hours));
                 resultSet = statement.executeQuery(query);
