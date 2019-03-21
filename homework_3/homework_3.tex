@@ -53,15 +53,17 @@
 					\node[entity] (customer) {顾客};
 					\node[attribute] (cname) [above=of customer] {姓名} edge (customer);
 					\node[attribute] (cid) [above left=of customer] {\key{社会安全号码}} edge (customer);
+					\node[attribute] (c_tel) [above right=of customer] {电话} edge (customer);
 	
 					\node[relationship] (have) [below=of customer] {拥有} edge node[auto] {1} (customer);
-					\node[entity] (address) [below left=of have] {地址} edge node[auto] {m} (have);
+					\node[entity] (address) [below=of have] {地址} edge node[auto] {m} (have);
 					\node[attribute] (state) [left=of address] {\key{州名}} edge (address);
 					\node[attribute] (city) [above left=of address] {\key{城市}} edge (address);
 					\node[attribute] (street) [below left=of address] {\key{街道}} edge (address);
+					\node[multi attribute] (telephone) [below=of address] {电话} edge (address);
 	
-					\node[entity] (telephone) [below=of have] {电话} edge node[auto] {n} (have);
-					\node[attribute] (telephone_number) [below=of telephone] {\key{电话号码}} edge (telephone);
+					% \node[entity] (telephone) [below=of have] {电话} edge node[auto] {n} (have);
+					% \node[attribute] (telephone_number) [below=of telephone] {\key{电话号码}} edge (telephone);
 	
 					\node[relationship] (own) [right=of have] {持有} edge node[auto] {1} (customer);
 					\node[entity] (account) [below=of own] {账户} edge node[auto] {n} (own);
@@ -121,7 +123,7 @@
 		\item ER图如上所示。
 		\item 转化得到的关系模式如下所示：
 		\begin{itemize}
-			\item \texttt{顾客(\underline{社会安全号码}，姓名)}
+			\item \texttt{顾客(\underline{社会安全号码}，姓名，电话)}
 			\item \texttt{顾客地址电话(\underline{社会安全号码}，\underline{城市}，\underline{州名}，\underline{街道}， \underline{电话号码})}
 			\item \texttt{账户(\underline{号码}，类型，收支情况)}
 			\item \texttt{顾客账户(\underline{社会安全号码}，\underline{号码})}
