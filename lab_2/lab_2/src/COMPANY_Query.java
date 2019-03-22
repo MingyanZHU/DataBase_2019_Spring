@@ -74,6 +74,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_PNO, paras[0]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ESSN");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ESSN"));
                     } else if (num == 2) {
@@ -83,6 +84,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_PNAME, paras[0]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ENAME");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ENAME"));
                     } else if (num == 3) {
@@ -92,6 +94,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_DNAME, paras[0]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ENAME");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ENAME") + "\t" + resultSet.getNString("ADDRESS"));
                     } else if (num == 4) {
@@ -101,6 +104,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_DNAME, paras[0]).replace(PARA_SALARY, paras[1]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ENAME\tADDRESS");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ENAME") + "\t" + resultSet.getNString("ADDRESS"));
                     } else if (num == 5) {
@@ -110,6 +114,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_PNO, paras[0]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ENAME");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ENAME"));
                     } else if (num == 6) {
@@ -119,6 +124,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_ENAME, paras[0]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ENAME\tDNAME");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ENAME") + "\t" + resultSet.getNString("DNAME"));
                     } else if (num == 7) {
@@ -128,6 +134,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_PNO + 1, paras[0]).replace(PARA_PNO + 2, paras[1]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("ESSN");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ESSN"));
                     } else if (num == 8) {
@@ -137,6 +144,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_SALARY, paras[0]);
                         resultSet = statement.executeQuery(query);
+                        System.out.println("DNAME");
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("DNAME"));
                     } else if (num == 9) {
@@ -146,6 +154,7 @@ public class COMPANY_Query {
                         System.out.println("Query " + num);
                         query = query.replace(PARA_N, paras[0]);
                         query = query.replace(PARA_HOURS, paras[1]);
+                        System.out.println("ENAME");
                         resultSet = statement.executeQuery(query);
                         while (resultSet.next())
                             System.out.println(resultSet.getNString("ENAME"));

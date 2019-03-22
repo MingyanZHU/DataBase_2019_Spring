@@ -29,6 +29,12 @@
     % \item IntelliJ IDEA Ultimate 2018.3.5
 \end{itemize}
 \section{实验过程及结果}
+实验中统一使用的命令行语句如下所示
+\begin{minted}{shell}
+    java -cp /lib/java_lib/commons-cli-1.4.jar:\
+    /lib/java_lib/mysql-connector-java-5.1.47.jar:\ 
+    COMPANY_Query -q <Number> -p [Parameters]
+\end{minted}
 \begin{enumerate}
     \item \begin{minted}{Java}
     String PARA_PNO = "%PNO%";
@@ -39,16 +45,16 @@
     String pno = cin.nextLine();
     query = query.replace(PARA_PNO, pno);
     resultSet = statement.executeQuery(query);
+    System.out.println("ESSN");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ESSN"));
     \end{minted}
-    当输入\texttt{\%PNO\%}为\texttt{P1}时, 实验结果如图\ref{fig:3.1}所示
+    当输入\texttt{\%PNO\%}为\texttt{P1}时, 实验结果如图\ref{fig:3.1}所示，由于结果过长，此处仅仅截取了部分结果。
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.4, bb=0 0 217 485]{media/3.1.eps}
+        \includegraphics[scale=0.4, bb=0 0 209 440]{media/3.1.eps}
         \caption{参加了项目编号为 \texttt{\%PNO\%} 的项目的员工姓名}\label{fig:3.1}
     \end{figure}
-    \newpage
    \item \begin{minted}{Java}
     String PARA_PNAME = "%PNAME%";
     String query = "SELECT ENAME FROM EMPLOYEE, WORKS_ON, PROJECT 
@@ -60,13 +66,14 @@
     String pname = cin.nextLine();
     query = query.replace(PARA_PNAME, pname);
     resultSet = statement.executeQuery(query);
+    System.out.println("ENAME");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ENAME"));
     \end{minted}
     当输入\texttt{\%PNAME\%}为\texttt{SQL Project}时, 实验结果如图\ref{fig:3.2}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale = 0.5, bb= 0 0 240 514]{media/3.2.eps}
+        \includegraphics[scale = 0.5, bb= 0 0 88 571]{media/3.2.eps}
         \caption{参加了项目名为\texttt{\%PNAME\%}的员工名字}\label{fig:3.2}
     \end{figure}
     \item \begin{minted}{Java}
@@ -79,6 +86,7 @@
     String dname = cin.nextLine();
     query = query.replace(PARA_DNAME, dname);
     resultSet = statement.executeQuery(query);
+    System.out.println("ENAME");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ENAME") + 
                             "\t" + resultSet.getNString("ADDRESS"));
@@ -86,7 +94,7 @@
     当输入\texttt{\%DNAME\%}为\texttt{International Department}时, 实验结果如图\ref{fig:3.3}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale = 0.5, bb= 0 0 407 351]{media/3.3.eps}
+        \includegraphics[scale = 0.5, bb= 0 0 465 392]{media/3.3.eps}
         \caption{在\texttt{\%PNAME\%}工作的所有工作人员的名字和地址}\label{fig:3.3}
     \end{figure}
     \item \begin{minted}{Java}
@@ -104,6 +112,7 @@
     query = query.replace(PARA_DNAME, dname)
                  .replace(PARA_SALARY, String.valueOf(salary));
     resultSet = statement.executeQuery(query);
+    System.out.println("ENAME\tADDRESS");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ENAME") + 
                             "\t" + resultSet.getNString("ADDRESS"));
@@ -112,7 +121,7 @@
     当输入\texttt{\%DNAME\%}为\texttt{International Department}, 输入\texttt{\%SALARY\%}为\texttt{4000}时, 实验结果如图\ref{fig:3.4}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale = 0.5, bb= 0 0 418 330]{media/3.4.eps}
+        \includegraphics[scale = 0.5, bb= 0 0 471 310]{media/3.4.eps}
         \caption{在\texttt{\%DNAME\%}工作且工资低于\texttt{\%SALARY\%}的员工的名字和地址}\label{fig:3.4}
     \end{figure}
     \item \begin{minted}{Java}
@@ -127,13 +136,14 @@
             pno = cin.nextLine();
             query = query.replace(PARA_PNO, pno);
             resultSet = statement.executeQuery(query);
+            System.out.println("ENAME");
             while (resultSet.next())
-            System.out.println(resultSet.getNString("ENAME"));
+                System.out.println(resultSet.getNString("ENAME"));
         \end{minted}
     当输入\texttt{\%PNO\%}为\texttt{P2}时, 实验结果如图\ref{fig:3.5}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.5, bb=0 0 197 325]{media/3.5.eps}
+        \includegraphics[scale=0.4, bb=0 0 97 338]{media/3.5.eps}
         \caption{没有参加项目编号为\texttt{\%PNO\%}的项目的员工姓名}\label{fig:3.5}
     \end{figure}
     \item \begin{minted}{Java}
@@ -148,6 +158,7 @@
     String ename = cin.nextLine();
     query = query.replace(PARA_ENAME, ename);
     resultSet = statement.executeQuery(query);
+    System.out.println("ENAME\tDNAME");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ENAME") + 
                             "\t" + resultSet.getNString("DNAME"));
@@ -155,10 +166,9 @@
     当输入\texttt{\%ENAME\%}为\texttt{张红}时, 实验结果如图\ref{fig:3.6}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.5, bb = 0 0 288 108]{media/3.6.eps}
+        \includegraphics[scale=0.5, bb = 0 0 334 102]{media/3.6.eps}
         \caption{由\texttt{\%ENAME\%}领导的工作人员的姓名和所在的部门名字}\label{fig:3.6}
     \end{figure}
-    \newpage
     \item \begin{minted}{Java}
     String PARA_PNO = "%PNO%";
     String query = "SELECT ESSN FROM WORKS_ON 
@@ -174,13 +184,14 @@
     pno = cin.nextLine();
     query = query.replace(PARA_PNO+2, pno);
     resultSet = statement.executeQuery(query);
+    System.out.println("ESSN");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ESSN"));
     \end{minted}
     当输入\texttt{\%PNO1\%}为\texttt{P1}, \texttt{\%PNO\%}为\texttt{P2}时, 实验结果如图\ref{fig:3.7}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale = 0.5, bb = 0 0 222 178]{media/3.7.eps}
+        \includegraphics[scale = 0.5, bb = 0 0 210 128]{media/3.7.eps}
         \caption{至少参加了项目编号为\texttt{\%PNO1\%}和\texttt{\%PNO2\%}的项目的员工号}\label{fig:3.7}
     \end{figure}
     \item \begin{minted}{Java}
@@ -194,13 +205,14 @@
     salary = Integer.parseInt(cin.nextLine());
     query = query.replace(PARA_SALARY, String.valueOf(salary));
     resultSet = statement.executeQuery(query);
+    System.out.println("DNAME");
     while (resultSet.next())
         System.out.println(resultSet.getNString("DNAME"));
     \end{minted}
     当输入\texttt{\%SALARY\%}为\texttt{3000}时, 实验结果如图\ref{fig:3.8}所示.
     \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.5, bb=0 0 275 198]{media/3.8.eps}
+    \includegraphics[scale=0.5, bb=0 0 290 206]{media/3.8.eps}
     \caption{员工平均工资低于\texttt{\%SALARY\%}元的部门名称}\label{fig:3.8}
     \end{figure}
     \item \begin{minted}{Java}
@@ -219,13 +231,14 @@
     int hours = Integer.parseInt(cin.nextLine());
     query = query.replace(PARA_HOURS, String.valueOf(hours));
     resultSet = statement.executeQuery(query);
+    System.out.println("ENAME");
     while (resultSet.next())
         System.out.println(resultSet.getNString("ENAME"));
     \end{minted}
     当输入\texttt{\%N\%}为\texttt{3}, 输入\texttt{\%HOURS\%}为\texttt{8}时, 实验结果如图\ref{fig:3.9}所示.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale = 0.5, bb=0 0 236 138]{media/3.9.eps}
+        \includegraphics[scale = 0.5, bb=0 0 109 74]{media/3.9.eps}
         \caption{至少参加了\texttt{\%N\%}个项目且工作总时间不超过\texttt{\%HOURS\%}小时的员工名字}\label{fig:3.9}
     \end{figure}
 \end{enumerate}
