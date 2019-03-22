@@ -53,6 +53,14 @@
             WHERE S.S# = SC.S#
             GROUP BY S.S# HAVING AVG(GRADE) < 60;
         \end{minted}
+        \textbf{注意此处的问题，在使用了\texttt{GROUP BY}子句后，\texttt{SELECT}子句的列名表中只能出现分组属性和聚集函数；从而，因为
+        因为此处需要\texttt{S\#, SNAME}，从而在分组时应该同时选择\texttt{S\#, SNAME}，修改后的SQL语句如下：}
+        \begin{minted}{SQL}
+            SELECT S#, SNAME
+            FROM S, SC
+            WHERE S.S# = SC.S#
+            GROUP BY S.S# S.SNAME HAVING AVG(GRADE) < 60;
+        \end{minted}
         \item[5)]\begin{minted}{SQL}
             SELECT S#
             FROM S, SC
@@ -143,8 +151,21 @@
             FROM Classes
             WHERE type = "bb";
         \end{minted}
+        \textbf{注意此处的问题应该是，所有的主力舰的火炮数量加和然后平均，改正后的SQL语句如下：}
+        \begin{minted}{SQL}
+            SELECT AVG(numGuns)
+            FROM Classes, Ships
+            WHERE Classes.class = Ships.class AND Classes.type = "bb";
+        \end{minted}
         \item[6)]\begin{minted}{SQL}
             SELECT  MIN(launched)
+            FROM Classes, Ships
+            WHERE Classes.class = Ships.class
+            GROUP BY Classes.class;
+        \end{minted}
+        \textbf{注意需要同时显示类名和下水年份，修改后的SQL语句如下：}
+        \begin{minted}{SQL}
+            SELECT  Classes.class, MIN(launched)
             FROM Classes, Ships
             WHERE Classes.class = Ships.class
             GROUP BY Classes.class;
