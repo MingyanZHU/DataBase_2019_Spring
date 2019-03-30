@@ -5,6 +5,7 @@
 
 \fancyhead[L]{\heiti 数据库系统课程实验报告}
 \fancyhead[R]{\heiti \ML@value@expname}
+\fancyfoot[R]{\thepage}
 
 % 姓名，学号
 \newcommand\infoauthor[2]{\def\ML@value@author{#1} \def\ML@value@ident{#2} }
