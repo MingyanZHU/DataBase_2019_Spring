@@ -1,0 +1,178 @@
+\documentclass[10pt, a4paper]{article}
+	% 使用12pt(对应于中文的小四号字)
+	% \usepackage{xeCJK} 
+	% \setmainfont{Times New Roman} 
+	% \setCJKmainfont[BoldFont=Hei]{Hei} 
+    \usepackage{array, ragged2e, pst-node, pst-dbicons}
+	\usepackage{ctex}
+	\usepackage{geometry}   %设置页边距的宏包
+    \usepackage{titlesec}   %设置页眉页脚的宏包
+    \usepackage{amssymb}
+    \usepackage{amsmath}
+    \usepackage{tikz-er2}
+	\usepackage{graphviz}
+	\usepackage{minted}
+	\newminted{text}{frame=lines, framesep=2mm}
+	\newminted{python}{frame=lines,  framesep=2mm,  linenos}
+    \geometry{left=3.17cm, right=3.17cm, top=2.54cm, bottom=2.54cm}  %设置 上、左、下、右 页边距
+	\begin{document}
+	\newpagestyle{main}{            
+		\sethead{哈尔滨工业大学}{数据库系统\_第四次作业}{1160300314 朱明彦}     %设置页眉
+		% \setfoot{左页脚}{中页脚}{右页脚}      %设置页脚, 可以在页脚添加 \thepage  显示页数
+		\setfoot{}{}{\thepage}
+		\headrule                                      % 添加页眉的下划线
+		% \footrule                                       %添加页脚的下划线
+	}
+	\pagestyle{main}    %使用该style
+	\usetikzlibrary{positioning}
+	\usetikzlibrary{shadows}
+	\usetikzlibrary{arrows}
+	\tikzstyle{every entity} = [top color=white,  bottom color=blue!30,  
+                            draw=blue!50!black!100,  drop shadow]
+	\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex,  
+                                 shadow yshift=-.7ex}]
+	\tikzstyle{every attribute} = [top color=white,  bottom color=yellow!20,  
+                               draw=yellow,  node distance=1cm,  drop shadow]
+	\tikzstyle{every relationship} = [top color=white,  bottom color=red!20,  
+                                  draw=red!50!black!100,  drop shadow]
+	\tikzstyle{every isa} = [top color=white,  bottom color=green!20,  
+                         draw=green!50!black!100,  drop shadow]
+
+	% \setlength{\baselineskip}{15.6pt}
+	% \setlength{\parskip}{0pt}
+	\renewcommand{\baselinestretch}{1.5}
+	
+	\begin{enumerate}
+		\item 
+		等价, 理由如下：
+		\begin{itemize}
+			\item 首先往证, $F^+ \subseteq G^+$.
+			\begin{itemize}
+				\item 由于$A \to CD \in G$, 所以有$A\to C,  A\to D$, 进而有$AC \to D$, 从而$G$蕴含$A\to C,  AC\to D$；
+				\item 又由于$E\to AH$, 有$E\to A,  E\to H$, 又$A\to D \in G^+$, 从而有$E\to D$, 故$G$蕴含$E\to AD,  E\to H$.
+			\end{itemize}
+			综上两点, 有$F^+ \subseteq G^+$.
+			\item 再证, $G^+ \subseteq F^+$.
+			\begin{itemize}
+				\item 由于$A\to C,  A\to A$且有$AC\to D$, 从而有$AC\to D$, 进而有$A\to CD$, 即$F$蕴含$A\to CD$.
+				\item 又由于$E\to AD$, 易有$E\to A$, 又$E\to H$, 从而有$E\to AH$, 即$F$蕴含$E\to AH$.
+			\end{itemize}
+			综上两点, 有$G^+ \subseteq F^+$.
+		\end{itemize}
+		综上所述, 可以有$F^+ = G^+$, 从而$F$和$G$等价.
+		\item \begin{enumerate}
+			\item[(1)] \textbf{3NF}.由于候选键是XY和XZ, 从而对于X,Y和Z而言均为键属性, 不存在非键属性对候选键的传递依赖和部分函数依赖, 所以至少为3NF; 又由于键属性Z对候选键XZ存在部分函数依赖, 故其不是BCNF. 所以其为3NF.
+			\item[(2)] \textbf{BCNF}. R的候选键为X和Y, 根据定义在函数依赖的左部均为候选键, 故其为BCNF.
+			\item[(3)] \textbf{1NF}. R的候选键为WX, 又由于$X\to Z, WX\to X$, 所以存在$WX\to Z$这个部分函数依赖, 所以其为1NF. 
+		\end{enumerate} 
+		\item \begin{enumerate}
+			\item[(1)] 首先将函数依赖集$F$转化为对应的函数右部仅有1个属性的形式.\\ 即$F=\{E\to G, G\to E, F\to E, F\to G, H\to E, H\to G, FH\to E\}$.
+			\item[(2)] 去掉左部冗余的属性, 由于$FH\to E, F\to E$, 从而$FH\to E$冗余\\ 化简后为$F=\{E\to G, G\to E, F\to E, F\to G, H\to E, H\to G\}$.
+			\item[(3)] 去掉冗余的函数依赖, 由于$F\to E, E\to G$可以得到$F\to G$, 从而后者冗余;同理可以有$H\to G$冗余,\\化简后的结果$F=\{E\to G, G\to E, F\to E, H\to E\}$. 
+		\end{enumerate}
+		故最终的结果为$F=\{E\to G, G\to E, F\to E, H\to E\}$.
+		\item 首先求得$F_m=\{E\to D, BC\to D, CD\to A\}$, 进而求得保持函数依赖的关系模式分解为$\rho = \{ED, BCD, ACD\}$
+		\item \begin{enumerate}
+			\item[(1)] 根据L类的定义, $B, E$是L类属性, 且此处不存在N类属性. 又$X_{BE}^+ = \{ABCDE\}$, 从而$\{BE\}$是唯一候选键.
+			\item[(2)] 初始化后的结果如表\ref{tab:1}所示, 最终结果如表\ref{tab:6}所示, 可以看到没有任意一行中包含$a_1, a_2, a_3, a_4, a_5$, 故\textbf{此处不是无损连接分解}.
+			\begin{figure}[H]
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $b_{23}$  & $b_{24}$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $b_{34}$ & $b_{35}$ \\ \hline
+						CDE & $b_{41}$ & $b_{42}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{53}$ & $b_{54}$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{初始化}\label{tab:1}
+				\end{minipage}
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $b_{13}$  & $b_{24}$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $b_{34}$ & $b_{35}$ \\ \hline
+						CDE & $b_{41}$ & $b_{42}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{$A\to C$}\label{tab:2}
+				\end{minipage}
+			\end{figure}
+			\begin{figure}[H]
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $b_{13}$  & $b_{24}$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
+						CDE & $b_{41}$ & $b_{42}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{$C\to D$}\label{tab:3}
+				\end{minipage}
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $b_{24}$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
+						CDE & $b_{41}$ & $b_{42}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{$B\to C$}\label{tab:4}
+				\end{minipage}
+			\end{figure}
+			\begin{figure}[H]
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $b_{24}$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
+						CDE & $b_{41}$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{$DE\to C$}\label{tab:5}
+				\end{minipage}
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $b_{24}$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
+						CDE & $b_{41}$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{$CE\to A$}\label{tab:6}
+				\end{minipage}
+			\end{figure}
+			\item[(3)] 由于$BE$是键, 且不存在任意一个依赖的左部是$BE$, 随机选择一个函数依赖即可开始算法.
+			\begin{enumerate}
+				\item 对于$A\to C$, A不是候选键, 所以我们可以拆分成两个关系$(AC), (ABDE)$. 则对于$<{AC}, {A\to C}>$, $A$是主键, 从而$(AC)$是BCNF;又$<{ABDE}, \emptyset>$所有属性均为键属性, 从而其同样为BCNF.算法结束.
+			\end{enumerate} 
+			最终拆分的结果为$(AC), (ABDE)$.
+		\end{enumerate}
+		\item \begin{enumerate}
+			\item[(1)] 因为\{课程编号,章节编号,学期,年\}$^+ = U$ 且 \{上课时间,教室, 课程编号, 章节编号\}$^+ = U$, 故候选键为\{课程编号,章节编号,学期,年\}和\{上课时间,教室, 课程编号, 章节编号\}, 并\textbf{选择\{上课时间,教室, 课程编号, 章节编号\}为主键}.
+			\item[(2)] 由于\{课程编号\} $\to$ \{学院, 课时, 等级\}的左部不为候选键, 所以$R$不是BCNF. 因此使用算法将其分解为BCNF.
+			\begin{enumerate}
+				\item 对于\{课程编号\} $\to$ \{学院, 课时, 等级\}, 其左部不为候选键, 故将R拆分为2个关系\{课程编号, 章节编号, 教师编号, 学期, 年, 上课时间, 教室, 学生数量\}和\{学院, 课时, 等级\}.
+				并且对于两个关系, 其函数依赖的左部均为候选码(第2个关系的函数依赖集为空集), 算法结束.
+			\end{enumerate} 
+			\textbf{规范化后的结果为\{课程编号, 章节编号, 教师编号, 学期, 年, 上课时间, 教室, 学生数量\}和\{学院, 课时, 等级\}
+}		\end{enumerate}
+	\end{enumerate}
+\end{document}
