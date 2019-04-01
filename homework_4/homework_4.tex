@@ -71,7 +71,7 @@
 			\item[(3)] 去掉冗余的函数依赖, 由于$F\to E, E\to G$可以得到$F\to G$, 从而后者冗余;同理可以有$H\to G$冗余,\\化简后的结果$F=\{E\to G, G\to E, F\to E, H\to E\}$. 
 		\end{enumerate}
 		故最终的结果为$F=\{E\to G, G\to E, F\to E, H\to E\}$.
-		\item 首先求得$F_m=\{E\to D, BC\to D, CD\to A\}$, 进而求得保持函数依赖的关系模式分解为$\rho = \{ED, BCD, ACD\}$
+		\item 首先求得$F_m=\{A\to D, E\to D, D\to B, BC\to D, CD\to A\}$, 进而求得保持函数依赖的关系模式分解为$\rho = \{AD, ED, BD, BCD, ACD\}$
 		\item \begin{enumerate}
 			\item[(1)] 根据L类的定义, $B, E$是L类属性, 且此处不存在N类属性. 又$X_{BE}^+ = \{ABCDE\}$, 从而$\{BE\}$是唯一候选键.
 			\item[(2)] 初始化后的结果如表\ref{tab:1}所示, 最终结果如表\ref{tab:6}所示, 可以看到没有任意一行中包含$a_1, a_2, a_3, a_4, a_5$, 故\textbf{此处不是无损连接分解}.
@@ -161,9 +161,10 @@
 			\end{figure}
 			\item[(3)] 由于$BE$是键, 且不存在任意一个依赖的左部是$BE$, 随机选择一个函数依赖即可开始算法.
 			\begin{enumerate}
-				\item 对于$A\to C$, A不是候选键, 所以我们可以拆分成两个关系$(AC), (ABDE)$. 则对于$<{AC}, {A\to C}>$, $A$是主键, 从而$(AC)$是BCNF;又$<{ABDE}, \emptyset>$所有属性均为键属性, 从而其同样为BCNF.算法结束.
+				\item 对于$A\to C$, A不是候选键, 所以我们可以拆分成两个关系$(AC), (ABDE)$. 则对于$<\{AC\}, \{A\to C\}>$, $A$是主键, 从而$(AC)$是BCNF;又$<\{ABDE\}, \{A\to D, B\to D, DE\to A\}>$, 候选键为$\{BE\}$, 故需要继续拆分$\{ABDE\}$.
+				\item 对于$A\to D$, A不是候选键, 所以我们可以将$(ABDE)$拆分成两个关系, $(AD), (ABE)$. 则对于$<\{AD\}, \{A\to D\}>$, 候选键为$A$, 其为BCNF; 又对$<\{ABE\}, \emptyset >$, 其所有属性均为键属性, 故其为BCNF, 算法结束.
 			\end{enumerate} 
-			最终拆分的结果为$(AC), (ABDE)$.
+			最终拆分的结果为$(AC), (AD), (ABE)$.
 		\end{enumerate}
 		\item \begin{enumerate}
 			\item[(1)] 因为\{课程编号,章节编号,学期,年\}$^+ = U$ 且 \{上课时间,教室, 课程编号, 章节编号\}$^+ = U$, 故候选键为\{课程编号,章节编号,学期,年\}和\{上课时间,教室, 课程编号, 章节编号\}, 并\textbf{选择\{上课时间,教室, 课程编号, 章节编号\}为主键}.
