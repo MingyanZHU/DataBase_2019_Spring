@@ -1,0 +1,147 @@
+\documentclass[10pt,a4paper]{article}
+	% 使用12pt(对应于中文的小四号字)
+	% \usepackage{xeCJK} 
+	% \setmainfont{Times New Roman} 
+	% \setCJKmainfont[BoldFont=Hei]{Hei} 
+    \usepackage{array,ragged2e,pst-node,pst-dbicons}
+	\usepackage{ctex}
+	\usepackage{geometry}   %设置页边距的宏包
+    \usepackage{titlesec}   %设置页眉页脚的宏包
+    \usepackage{amssymb}
+    \usepackage{amsmath}
+    \usepackage{tikz-er2}
+    \usepackage{graphviz}
+    \geometry{left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}  %设置 上、左、下、右 页边距
+	\begin{document}
+	\newpagestyle{main}{            
+		\sethead{哈尔滨工业大学}{Lab3-DreamHome\_ER\_Diagram}{1160300314 朱明彦}     %设置页眉
+		% \setfoot{左页脚}{中页脚}{右页脚}      %设置页脚，可以在页脚添加 \thepage  显示页数
+		\setfoot{}{}{\thepage}
+		\headrule                                      % 添加页眉的下划线
+		% \footrule                                       %添加页脚的下划线
+	}
+	\pagestyle{main}    %使用该style
+	\usetikzlibrary{positioning}
+	\usetikzlibrary{shadows}
+	\usetikzlibrary{arrows}
+	\tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
+                            draw=blue!50!black!100, drop shadow]
+	\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex, 
+                                 shadow yshift=-.7ex}]
+	\tikzstyle{every attribute} = [top color=white, bottom color=yellow!20, 
+                               draw=yellow, node distance=1cm, drop shadow]
+	\tikzstyle{every relationship} = [top color=white, bottom color=red!20, 
+                                  draw=red!50!black!100, drop shadow]
+	\tikzstyle{every isa} = [top color=white, bottom color=green!20, 
+                         draw=green!50!black!100, drop shadow]
+
+	% \setlength{\baselineskip}{15.6pt}
+	\setlength{\parskip}{0pt}
+	\renewcommand{\baselinestretch}{1.5}
+		
+	\begin{center}
+		\scalebox{0.75}{
+				\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+					\node[entity] (branch) {分公司};
+					\node[attribute] (branch_number) [above=of branch] {\key{公司编号}} edge (branch);
+					\node[attribute] (branch_address) [above right=of branch] {公司地址} edge (branch);
+					\node[attribute] (branch_address_street) [right=of branch_address] {街道} edge (branch_address);
+					\node[attribute] (branch_address_city) [above right=of branch_address] {城市} edge (branch_address);
+					\node[attribute] (branch_address_postcode) [below right=of branch_address] {邮编} edge (branch_address);
+					\node[multi attribute] (branch_telephone_number) [above left=of branch] {分公司电话号码} edge (branch);
+
+					\node[relationship] (manager) [left=of branch] {经理} edge node [auto] {1} (branch);
+					\node[attribute] (manager_start_date) [left=0.5cm of branch_telephone_number] {经理任职日期} edge (manager);
+					\node[attribute] (manager_bouns) [left=of manager] {经理奖金} edge (manager);
+
+					\node[entity] (staff) [below left=of manager] {员工} edge node [auto] {1} (manager);
+					\node[attribute] (staff_number) [above left=of staff] {\key{员工编号}} edge (staff);
+					\node[attribute] (staff_address) [left=of staff] {员工地址} edge (staff);
+					\node[attribute] (staff_name) [below left=of staff] {员工名字} edge (staff);
+					\node[attribute] (staff_salary) [below=0.5cm of staff_name] {员工工资} edge (staff);
+					\node[attribute] (staff_position) [below=of staff] {职位} edge (staff);
+					\node[attribute] (staff_superior) [below=0.5cm of manager] {主管名字} edge (staff);
+					\node[attribute] (staff_branch) [below=0.5cm of staff_superior] {所在分公司编号} edge (staff);
+					
+					\node[entity] (property) [below=of staff_salary] {出租的房产};
+					\node[attribute] (property_number) [above left=of property] {\key{房产编号}} edge (property);
+					\node[attribute] (property_address) [above right=of property] {地址} edge (property);
+					\node[attribute] (property_address_street) [above right=of property_address] {街道} edge (property_address);
+					\node[attribute] (property_address_city) [right=of property_address] {城市} edge (property_address);
+					\node[attribute] (property_address_postcode) [below right=of property_address] {邮编} edge (property_address);
+					\node[attribute] (property_type) [left=of property] {房产类型} edge (property);
+					\node[attribute] (number_of_rooms) [below left=of property] {房间数量} edge (property);
+					\node[attribute] (monthly_rent) [below=of property] {每月租金} edge (property);
+					\node[attribute] (owner_numebr) [below right=of property] {业主编号} edge (property);
+
+ 					% \node[entity] (customer) {顾客};
+					% \node[attribute] (cname) [above=of customer] {姓名} edge (customer);
+					% \node[attribute] (cid) [above left=of customer] {\key{社会安全号码}} edge (customer);
+					% \node[attribute] (c_tel) [above right=of customer] {电话} edge (customer);
+	
+					% \node[relationship] (have) [below=of customer] {拥有} edge node[auto] {1} (customer);
+					% \node[entity] (address) [below=of have] {地址} edge node[auto] {m} (have);
+					% \node[attribute] (state) [left=of address] {\key{州名}} edge (address);
+					% \node[attribute] (city) [above left=of address] {\key{城市}} edge (address);
+					% \node[attribute] (street) [below left=of address] {\key{街道}} edge (address);
+					% \node[multi attribute] (telephone) [below=of address] {电话} edge (address);
+	
+					% \node[entity] (telephone) [below=of have] {电话} edge node[auto] {n} (have);
+					% \node[attribute] (telephone_number) [below=of telephone] {\key{电话号码}} edge (telephone);
+	
+					% \node[relationship] (own) [right=of have] {持有} edge node[auto] {1} (customer);
+					% \node[entity] (account) [below=of own] {账户} edge node[auto] {n} (own);
+	
+					% \node[attribute] (acc_id) [above right=of account] {\key{号码}} edge (account);
+					% \node[attribute] (type) [right=of account] {类型} edge (account);
+					% \node[attribute] (incomde) [below right=of account] {收支情况} edge (account);
+					% \node[isa] (isa) [below=1cm of emp] {ISA} edge (emp);
+				  
+					% \node[entity] (mec) [below left=1cm of isa] {Mechanic} edge (isa);
+					% \node[entity] (sal) [below right=1cm of isa] {Salesman} edge (isa);
+				  
+					% \node[relationship] (does) [left=of mec] {Does} edge (mec);
+				  
+					% \node[weak entity] (rep) [below=of does] {RepairJob} edge (does);
+					% \node[attribute] (rnum) [left=of rep] {\discriminator{Number}} edge (rep);
+					% \node[attribute] (desc) [above left=of rep] {Description} edge (rep);
+					% \node[attribute] (cost) [below left=of rep] {Cost} edge (rep);
+					% \node[attribute] (mat) [left=0.5cm of cost] {Parts} edge (cost);
+					% \node[attribute] (work) [below left=0.5cm of cost] {Work} edge (cost);
+				  
+					% \node[ident relationship] (reps) [below=of rep] {Repairs} edge [total] (rep);
+				  
+					% \node[entity] (car) [right=of reps] {Car} edge [<-] (reps);
+					% \node[attribute] (lic) [above=of car] {\key{License}} edge (car);
+					% \node[attribute] (mod) [below=of car] {Model} edge (car);
+					% \node[attribute] (year) [below right=of car] {Year} edge (car);
+					% \node[attribute] (manu) [below left=1.5cm of car] {Manufacturer} edge (car);
+					
+					% \node[relationship] (buy) [below=of sal] {Buys};
+					% \node[attribute] (pri) [above left=of buy] {Price} edge (buy);
+					% \node[attribute] (sdate) [left=of buy] {Date} edge (buy);
+					% \node[attribute] (bval) [below left=of buy] {Value} edge (buy);
+				  
+					% \node[relationship] (sel) [right=of buy] {Sells};
+					% \node[attribute] (sdate) [above right=of sel] {Date} edge (sel);
+					% \node[derived attribute] (sval) [right=of sel] {Value} edge (sel);
+					% \node[attribute] (com) [below right=of sel] {Comission} edge (sel);
+					
+					% \draw[link] (car.10) -| (buy) (buy) edge (sal);
+					% \draw[link] (car.-10) -| (sel) (sel) |- (sal);
+				  
+					% \node[entity] (cli) [below right=0.5cm and 3.7cm of car] {Client};
+					% \node[attribute] (cid) [right=of cli] {\key{ID}} edge (cli);
+					% \node[attribute] (cname) [below left=of cli] {Name} edge (cli);
+					% \node[multi attribute] (cphone) [below right=of cli] {Phone} edge (cli);
+					% \node[attribute] (cadd) [below=of cli] {Address} edge (cli);
+				  
+					% \draw[link] (cli.70) |- node [pos=0.05, auto, swap] {buyer} (sel);
+					% \draw[link] (cli.110) |- node [pos=0.05, auto] {seller} (buy);
+				  
+				  \end{tikzpicture}	  
+			}
+	
+		\end{center}
+	
+\end{document}
