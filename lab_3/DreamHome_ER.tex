@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[12pt,landscape, a3paper]{article}
 	% 使用12pt(对应于中文的小四号字)
 	% \usepackage{xeCJK} 
 	% \setmainfont{Times New Roman} 
@@ -12,6 +12,19 @@
     \usepackage{tikz-er2}
     \usepackage{graphviz}
     \geometry{left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}  %设置 上、左、下、右 页边距
+	\usetikzlibrary{positioning}
+	\usetikzlibrary{shadows}
+	\usetikzlibrary{arrows}
+	\tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
+							draw=blue!50!black!100, drop shadow]
+	\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex, 
+								 shadow yshift=-.7ex}]
+	\tikzstyle{every attribute} = [top color=white, bottom color=yellow!20, 
+							   draw=yellow, node distance=1cm, drop shadow]
+	\tikzstyle{every relationship} = [top color=white, bottom color=red!20, 
+								  draw=red!50!black!100, drop shadow]
+	\tikzstyle{every isa} = [top color=white, bottom color=green!20, 
+						 draw=green!50!black!100, drop shadow]
 	\begin{document}
 	\newpagestyle{main}{            
 		\sethead{哈尔滨工业大学}{Lab3-DreamHome\_ER\_Diagram}{1160300314 朱明彦}     %设置页眉
@@ -21,30 +34,15 @@
 		% \footrule                                       %添加页脚的下划线
 	}
 	\pagestyle{main}    %使用该style
-	\usetikzlibrary{positioning}
-	\usetikzlibrary{shadows}
-	\usetikzlibrary{arrows}
-	\tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
-                            draw=blue!50!black!100, drop shadow]
-	\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex, 
-                                 shadow yshift=-.7ex}]
-	\tikzstyle{every attribute} = [top color=white, bottom color=yellow!20, 
-                               draw=yellow, node distance=1cm, drop shadow]
-	\tikzstyle{every relationship} = [top color=white, bottom color=red!20, 
-                                  draw=red!50!black!100, drop shadow]
-	\tikzstyle{every isa} = [top color=white, bottom color=green!20, 
-                         draw=green!50!black!100, drop shadow]
-
 	% \setlength{\baselineskip}{15.6pt}
-	\setlength{\parskip}{0pt}
-	\renewcommand{\baselinestretch}{1.5}
-		
+	% \setlength{\parskip}{0pt}
+	% \renewcommand{\baselinestretch}{1.5}
 	\begin{center}
 		\scalebox{0.75}{
 				\begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
 					\node[entity] (branch) {分公司};
-					\node[attribute] (branch_number) [above=of branch] {\key{公司编号}} edge (branch);
-					\node[attribute] (branch_address) [above right=of branch] {公司地址} edge (branch);
+					\node[attribute] (branch_number) [above right=of branch] {\key{公司编号}} edge (branch);
+					\node[attribute] (branch_address) [right=of branch] {公司地址} edge (branch);
 					\node[attribute] (branch_address_street) [right=of branch_address] {街道} edge (branch_address);
 					\node[attribute] (branch_address_city) [above right=of branch_address] {城市} edge (branch_address);
 					\node[attribute] (branch_address_postcode) [below right=of branch_address] {邮编} edge (branch_address);
@@ -52,29 +50,90 @@
 
 					\node[relationship] (manager) [left=of branch] {经理} edge node [auto] {1} (branch);
 					\node[attribute] (manager_start_date) [left=0.5cm of branch_telephone_number] {经理任职日期} edge (manager);
-					\node[attribute] (manager_bouns) [left=of manager] {经理奖金} edge (manager);
+					\node[attribute] (manager_bouns) [below=0.5cm of manager_start_date] {经理奖金} edge (manager);
 
-					\node[entity] (staff) [below left=of manager] {员工} edge node [auto] {1} (manager);
+					\node[entity] (staff) [below left=of manager_bouns] {员工} edge node [auto] {1} (manager);
 					\node[attribute] (staff_number) [above left=of staff] {\key{员工编号}} edge (staff);
 					\node[attribute] (staff_address) [left=of staff] {员工地址} edge (staff);
-					\node[attribute] (staff_name) [below left=of staff] {员工名字} edge (staff);
-					\node[attribute] (staff_salary) [below=0.5cm of staff_name] {员工工资} edge (staff);
-					\node[attribute] (staff_position) [below=of staff] {职位} edge (staff);
-					\node[attribute] (staff_superior) [below=0.5cm of manager] {主管名字} edge (staff);
-					\node[attribute] (staff_branch) [below=0.5cm of staff_superior] {所在分公司编号} edge (staff);
+					\node[attribute] (staff_salary) [above=of staff] {员工工资} edge (staff);
+					\node[attribute] (staff_name) [below=0.5cm of staff_address] {员工名字} edge (staff);
+					\node[attribute] (staff_position) [below =0.5cm of staff_name] {职位} edge (staff);
+					% \node[attribute] (staff_branch) [below=0.5cm of staff_superior] {所在分公司编号} edge (staff);
 					
-					\node[entity] (property) [below=of staff_salary] {出租的房产};
+					\node[relationship] (charge) [below=of staff] {负责} edge node[auto] {1} (staff);
+					
+					\node[relationship] (staff_work_in) [right=of staff] {在} edge node [auto] {m} (staff);
+					\draw[thick] (staff_work_in) -- node[auto] {1} (branch);
+					\node[attribute] (staff_superior) [below=0.5cm of staff_work_in] {主管名字} edge (staff);
+					% \node[relationship] (staff_superior) [below right=of staff] {主管} edge node [auto] {1} (staff);
+					% \draw[edge] (staff) -- node[auto] {m} (staff_superior);
+					
+					\node[entity] (property) [below=of charge] {出租的房产} edge node [auto] {m} (charge);
 					\node[attribute] (property_number) [above left=of property] {\key{房产编号}} edge (property);
-					\node[attribute] (property_address) [above right=of property] {地址} edge (property);
-					\node[attribute] (property_address_street) [above right=of property_address] {街道} edge (property_address);
-					\node[attribute] (property_address_city) [right=of property_address] {城市} edge (property_address);
-					\node[attribute] (property_address_postcode) [below right=of property_address] {邮编} edge (property_address);
 					\node[attribute] (property_type) [left=of property] {房产类型} edge (property);
-					\node[attribute] (number_of_rooms) [below left=of property] {房间数量} edge (property);
-					\node[attribute] (monthly_rent) [below=of property] {每月租金} edge (property);
-					\node[attribute] (owner_numebr) [below right=of property] {业主编号} edge (property);
+					\node[attribute] (number_of_rooms) [below=0.3cm of property_type] {房间数量} edge (property);
+					\node[attribute] (property_address) [below=0.5cm of number_of_rooms] {地址} edge (property);
+					\node[attribute] (property_address_street) [above left=of property_address] {街道} edge (property_address);
+					\node[attribute] (property_address_city) [left=of property_address] {城市} edge (property_address);
+					\node[attribute] (property_address_postcode) [below left=of property_address] {邮编} edge (property_address);
+					\node[attribute] (monthly_rent) [below right=of property] {每月租金} edge (property);
+					% \node[attribute] (owner_numebr) [below right=of property] {业主编号} edge (property);
 
- 					% \node[entity] (customer) {顾客};
+					\node[relationship] (have) [below=of property] {有} edge node [auto] {1} (property);
+
+					\node[entity] (property_owners) [below=of have] {业主} edge node[auto] {1} (have);
+					\node[attribute] (property_owners_number) [right=of property_owners] {\key{业主编号}} edge (property_owners);
+					\node[attribute] (property_owners_name) [above right=of property_owners] {名字} edge (property_owners);
+					\node[attribute] (property_owners_address) [above left=of property_owners] {地址} edge (property_owners);
+					\node[attribute] (property_owners_telephone) [left=of property_owners] {电话} edge (property_owners);
+					
+					\node[isa] (owners_type) [below=of property_owners] {x};
+					\draw[double, thick] (property_owners) -- (owners_type);
+					\node[entity] (private_owners) [below left=of owners_type] {私人业主};
+					\draw[double, thick] (private_owners) -- (owners_type);
+					\node[entity] (business_owners) [below right=of owners_type] {企业业主};
+					\draw[double, thick] (business_owners) -- (owners_type);
+					\node[attribute] (business_owners_type) [below left=of business_owners] {企业类型} edge (business_owners);
+					\node[attribute] (business_owners_contact) [below right=of business_owners] {联系人姓名} edge (business_owners);
+
+					\node[attribute] (newspaper_name) [right=of property_owners_number] {\key{报纸名字}};
+					\node[entity] (newspaper) [right=of newspaper_name] {报纸} edge (newspaper_name);
+					\node[attribute] (newspaper_address) [above right=of newspaper] {地址} edge (newspaper);
+					\node[attribute] (newspaper_telephone) [above left=of newspaper] {电话} edge (newspaper);
+					\node[attribute] (newspaper_contact) [right=of newspaper] {联系人姓名} edge (newspaper);
+					
+					\node[relationship] (carry) [below=of newspaper] {刊登} edge node [auto] {1} (newspaper);
+					\node[weak entity] (advertisement) [below=of carry] {广告} edge node [auto] {m} (carry);
+					\node[attribute] (ad_property_numebr) [below left=of advertisement] {\discriminator{房产编号}} edge (advertisement);
+					\node[attribute] (ad_date) [below=of advertisement] {\discriminator{广告日期}} edge (advertisement);
+					\node[attribute] (ad_rent) [below right=of advertisement] {广告费用} edge (advertisement);
+					
+					
+					\node[relationship] (property_viewing) [below=of manager] {看房};
+					\node[attribute] (property_viewing_date) [right=of property_viewing] {看房日期} edge (property_viewing);
+					\node[attribute] (property_viewing_comment) [above right=of property_viewing] {评论} edge (property_viewing);
+					\draw[thick] (property_viewing) -- node [above] {n} (property);
+					\node[relationship] (leases) [below=of property_viewing] {租约};
+					\draw[thick] (leases) -- node [auto] {1} (property);
+					\node[attribute] (leases_monthly_rent) [below left=of leases] {每月租金} edge (leases);
+					\node[attribute] (leases_method_of_payment) [below=0.5cm of leases_monthly_rent] {付款方式} edge (leases);
+					\node[attribute] (leases_deposit) [below=of leases] {定金} edge (leases);
+					\node[attribute] (leases_number) [below right=of leases] {\key{租期编号}} edge (leases);
+					\node[attribute] (leases_deposit_whether) [below=0.5cm of leases_number] {定金是否支付} edge (leases);					
+					\node[attribute] (leases_start_date) [above left=of leases] {租约始期} edge (leases);
+					\node[attribute] (leases_end_date) [above=0.5cm of leases] {租约终期} edge (leases);
+					\node[attribute] (leases_duration) [above right=of leases] {租约时长} edge (leases);
+
+					\node[entity] (client) [right=5cm of leases] {客户};
+					\node[attribute] (client_name) [right=of client] {客户名字} edge (client);
+					\node[attribute] (client_number) [above=0.5cm of client_name] {\key{客户编号}} edge (client);
+					\node[attribute] (client_telephone) [below=0.5cm of client_name] {电话号码} edge (client);
+					\node[attribute] (client_accomodation_type) [below=of client] {喜欢的住所类型} edge (client);
+					\node[attribute] (client_max_rent) [above=of client] {最多可支付租金} edge (client);
+
+					\draw[thick] (client) -- node [above] {m} (property_viewing);
+					\draw[thick] (client) -- node [auto] {1} (leases);
+  					% \node[entity] (customer) {顾客};
 					% \node[attribute] (cname) [above=of customer] {姓名} edge (customer);
 					% \node[attribute] (cid) [above left=of customer] {\key{社会安全号码}} edge (customer);
 					% \node[attribute] (c_tel) [above right=of customer] {电话} edge (customer);
@@ -141,7 +200,6 @@
 				  
 				  \end{tikzpicture}	  
 			}
-	
 		\end{center}
 	
 \end{document}
