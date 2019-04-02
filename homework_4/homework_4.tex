@@ -74,7 +74,8 @@
 		\item 首先求得$F_m=\{A\to D, E\to D, D\to B, BC\to D, CD\to A\}$, 进而求得保持函数依赖的关系模式分解为$\rho = \{AD, ED, BD, BCD, ACD\}$
 		\item \begin{enumerate}
 			\item[(1)] 根据L类的定义, $B, E$是L类属性, 且此处不存在N类属性. 又$X_{BE}^+ = \{ABCDE\}$, 从而$\{BE\}$是唯一候选键.
-			\item[(2)] 初始化后的结果如表\ref{tab:1}所示, 最终结果如表\ref{tab:6}所示, 可以看到没有任意一行中包含$a_1, a_2, a_3, a_4, a_5$, 故\textbf{此处不是无损连接分解}.
+			\item[(2)] 初始化后的结果如表\ref{tab:1}所示, 在依次考察完所有的依赖集之后, 如表\ref{tab:6}所示, 其与初始化后的表\ref{tab:1}有不同且没有任意一行包含所有$a_i$, 故开始第二轮依次考察所有的依赖;
+			第二轮考察的最终结果如表\ref{tab:8}所示, 可以看到没有任意一行中包含$a_i$, 其相较与表\ref{tab:7}没发生变化, 故\textbf{此处不是无损连接分解}.
 			\begin{figure}[H]
 				\begin{minipage}[b]{0.5\linewidth}
 					\centering
@@ -110,10 +111,10 @@
 						\hline
 							& A & B & C & D & E \\ \hline
 						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
-						AB  & $a_1$ & $a_2$  & $b_{13}$  & $b_{24}$ & $b_{25}$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $b_{13}$  & $a_4$ & $b_{25}$  \\ \hline
 						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
 						CDE & $b_{41}$ & $b_{42}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
-						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $a_4$ & $a_5$ \\ \hline
 						\end{tabular}
 						\caption{$C\to D$}\label{tab:3}
 				\end{minipage}
@@ -122,11 +123,11 @@
 					\begin{tabular}{|l|l|l|l|l|l|}
 						\hline
 							& A & B & C & D & E \\ \hline
-						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
-						AB  & $a_1$ & $a_2$  & $a_3$  & $b_{24}$ & $b_{25}$  \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $a_3$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $a_4$ & $b_{25}$  \\ \hline
 						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
 						CDE & $b_{41}$ & $b_{42}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
-						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
 						\end{tabular}
 						\caption{$B\to C$}\label{tab:4}
 				\end{minipage}
@@ -137,11 +138,11 @@
 					\begin{tabular}{|l|l|l|l|l|l|}
 						\hline
 							& A & B & C & D & E \\ \hline
-						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
-						AB  & $a_1$ & $a_2$  & $a_3$  & $b_{24}$ & $b_{25}$  \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $a_3$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $a_4$ & $b_{25}$  \\ \hline
 						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
 						CDE & $b_{41}$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
-						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
 						\end{tabular}
 						\caption{$DE\to C$}\label{tab:5}
 				\end{minipage}
@@ -150,15 +151,44 @@
 					\begin{tabular}{|l|l|l|l|l|l|}
 						\hline
 							& A & B & C & D & E \\ \hline
-						AD  & $a_1$ & $b_{12}$ & $b_{13}$  & $a_4$  & $a_5$  \\ \hline
-						AB  & $a_1$ & $a_2$  & $a_3$  & $b_{24}$ & $b_{25}$  \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $a_3$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $a_4$ & $b_{25}$  \\ \hline
 						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
-						CDE & $b_{41}$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
-						AE  & $a_1$ & $b_{52}$ & $b_{13}$ & $b_{54}$ & $a_5$ \\ \hline
+						CDE & $a_1$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
 						\end{tabular}
 						\caption{$CE\to A$}\label{tab:6}
 				\end{minipage}
 			\end{figure}
+			\begin{figure}[H]
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $a_3$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $a_4$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
+						CDE & $a_1$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{第2轮考察$A\to C$}\label{tab:7}
+				\end{minipage}
+				\begin{minipage}[b]{0.5\linewidth}
+					\centering
+					\begin{tabular}{|l|l|l|l|l|l|}
+						\hline
+							& A & B & C & D & E \\ \hline
+						AD  & $a_1$ & $b_{12}$ & $a_3$  & $a_4$  & $a_5$  \\ \hline
+						AB  & $a_1$ & $a_2$  & $a_3$  & $a_4$ & $b_{25}$  \\ \hline
+						BC  & $b_{31}$ &  $a_2$ & $a_3$ & $a_4$ & $b_{35}$ \\ \hline
+						CDE & $a_1$ & $b_{12}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						AE  & $a_1$ & $b_{52}$ & $a_3$ & $a_4$ & $a_5$ \\ \hline
+						\end{tabular}
+						\caption{第2轮考察完所有的依赖}\label{tab:8}
+				\end{minipage}
+			\end{figure}
+			
 			\item[(3)] 由于$BE$是键, 且不存在任意一个依赖的左部是$BE$, 随机选择一个函数依赖即可开始算法.
 			\begin{enumerate}
 				\item 对于$A\to C$, A不是候选键, 所以我们可以拆分成两个关系$(AC), (ABDE)$. 则对于$<\{AC\}, \{A\to C\}>$, $A$是主键, 从而$(AC)$是BCNF;又$<\{ABDE\}, \{A\to D, B\to D, DE\to A\}>$, 候选键为$\{BE\}$, 故需要继续拆分$\{ABDE\}$.
