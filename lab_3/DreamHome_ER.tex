@@ -54,9 +54,9 @@
 
 					\node[entity] (staff) [below left=of manager_bouns] {员工} edge node [auto] {1} (manager);
 					\node[attribute] (staff_number) [above left=of staff] {\key{员工编号}} edge (staff);
-					\node[attribute] (staff_address) [left=of staff] {员工地址} edge (staff);
+					\node[attribute] (staff_gender) [left=of staff] {员工性别} edge (staff);
 					\node[attribute] (staff_salary) [above=of staff] {员工工资} edge (staff);
-					\node[attribute] (staff_name) [below=0.5cm of staff_address] {员工名字} edge (staff);
+					\node[attribute] (staff_name) [below=0.5cm of staff_gender] {员工名字} edge (staff);
 					\node[attribute] (staff_position) [below =0.5cm of staff_name] {职位} edge (staff);
 					% \node[attribute] (staff_branch) [below=0.5cm of staff_superior] {所在分公司编号} edge (staff);
 					

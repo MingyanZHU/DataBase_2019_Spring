@@ -1,0 +1,2 @@
+C101,HUAWEI,Shenzhen Guangdong,400-830-8300,Technology,Zhengfei Ren
+C102,Alibaba,Hangzhou Zhejiang,400-860-8608,EBuy,Jack Ma
