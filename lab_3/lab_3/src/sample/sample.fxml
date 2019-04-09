@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -22,37 +23,316 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <BorderPane layoutX="113.0" layoutY="14.0" prefHeight="294.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <bottom>
-                                                <Button fx:id="Branch_Search_But" mnemonicParsing="false" text="Search" BorderPane.alignment="CENTER" onAction="#testButton"/>
-                                             </bottom>
-                                             <center>
-                                                <TextArea fx:id="Branch_Search_Output" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                                             </center>
-                                             <left>
-                                                <TitledPane animated="false" prefHeight="250.0" prefWidth="260.0" text="SQL" BorderPane.alignment="CENTER">
-                                                  <content>
-                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <TabPane prefHeight="294.0" prefWidth="598.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <tabs>
+                                              <Tab fx:id="tabSearchBranch" onSelectionChanged="#BranchSearchChanged" text="Branch Info">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                          <children>
-                                                            <TextArea fx:id="Branch_Search_SQL_Input" layoutX="44.0" layoutY="32.0" prefHeight="225.0" prefWidth="258.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                            <BorderPane layoutX="57.0" layoutY="62.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <top>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                    <columnConstraints>
+                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="281.0" minWidth="10.0" prefWidth="110.99999237060547" />
+                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="467.00000762939453" minWidth="10.0" prefWidth="467.00000762939453" />
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                    </rowConstraints>
+                                                                     <children>
+                                                                        <Label text="Branch City" />
+                                                                        <ChoiceBox fx:id="searchBranchCity" prefHeight="24.0" prefWidth="464.0" GridPane.columnIndex="1" />
+                                                                     </children>
+                                                                  </GridPane>
+                                                               </top>
+                                                               <center>
+                                                                  <TextArea fx:id="searchBranchAnswer" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                               </center>
+                                                               <bottom>
+                                                                  <Button fx:id="searchBranchButton" mnemonicParsing="false" onAction="#searchBranchButton" text="Search" BorderPane.alignment="CENTER" />
+                                                               </bottom>
+                                                            </BorderPane>
                                                          </children>
                                                       </AnchorPane>
-                                                  </content>
-                                                </TitledPane>
-                                             </left>
-                                          </BorderPane>
+                                                </content>
+                                              </Tab>
+                                              <Tab fx:id="overAverageAdProperty" onSelectionChanged="#BranchSearchChanged" text="Over Average Ad Property ">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <TextArea fx:id="overAverageAnswer" layoutX="189.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                         </children></AnchorPane>
+                                                </content>
+                                              </Tab>
+                                            </tabs>
+                                          </TabPane>
                                        </children>
                                     </AnchorPane>
                               </content>
                             </TitledPane>
-                            <TitledPane animated="false" text="untitled 2">
+                            <TitledPane animated="false" text="Input">
                               <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TabPane prefHeight="294.0" prefWidth="598.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <tabs>
+                                              <Tab fx:id="tabInputBranch" onSelectionChanged="#BranchInputChanged" text="Input Branch">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane alignment="CENTER" layoutX="102.0" layoutY="59.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="281.0" minWidth="10.0" prefWidth="157.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="421.0" minWidth="10.0" prefWidth="421.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label contentDisplay="CENTER" text="Branch_no" textAlignment="CENTER">
+                                                                     <font>
+                                                                        <Font size="18.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <TextField fx:id="inputBranchNo" GridPane.columnIndex="1" />
+                                                                  <Label text="Street" GridPane.rowIndex="1">
+                                                                     <font>
+                                                                        <Font size="18.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <Label text="City" GridPane.rowIndex="2">
+                                                                     <font>
+                                                                        <Font size="18.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <Label text="Postcode" GridPane.rowIndex="3">
+                                                                     <font>
+                                                                        <Font size="18.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <TextField fx:id="inputBranchStreet" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="inputBranchCity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                                  <TextField fx:id="inputBranchPostcode" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                  <Button fx:id="inputBranchAddBut" mnemonicParsing="false" onAction="#BranchInputAdd" prefHeight="24.0" prefWidth="76.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                              <Tab fx:id="tabInputStaff" onSelectionChanged="#BranchInputChanged" text="Input Staff">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane layoutX="100.0" layoutY="106.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="134.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="444.0" minWidth="10.0" prefWidth="444.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label text="Staff_no" />
+                                                                  <Label text="Staff_name" GridPane.rowIndex="1" />
+                                                                  <Label text="Staff_position" GridPane.rowIndex="2" />
+                                                                  <Label text="Staff_gender" GridPane.rowIndex="3" />
+                                                                  <Label text="Staff_superior" GridPane.rowIndex="4" />
+                                                                  <Label text="Staff_salary" GridPane.rowIndex="5" />
+                                                                  <Label text="Staff_branch" GridPane.rowIndex="6" />
+                                                                  <TextField fx:id="inputStaffNo" GridPane.columnIndex="1" />
+                                                                  <TextField fx:id="inputStaffName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="inputStaffSuperior" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                                  <TextField fx:id="inputStaffSalary" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                                  <ChoiceBox fx:id="inputStaffBranch" prefHeight="24.0" prefWidth="445.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                                  <Button fx:id="inputStaffBut" mnemonicParsing="false" onAction="#StaffInputAdd" prefHeight="24.0" prefWidth="59.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                                                  <ChoiceBox fx:id="inputStaffGender" prefHeight="24.0" prefWidth="446.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                  <ChoiceBox fx:id="inputStaffPosition" prefHeight="24.0" prefWidth="443.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                                <Tab fx:id="tabInputLease" onSelectionChanged="#BranchInputChanged" text="Input Lease">
+                                                   <content>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane layoutX="189.0" layoutY="121.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="139.0" minWidth="10.0" prefWidth="74.99999237060547" />
+                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.00000762939453" minWidth="10.0" prefWidth="154.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="191.0" minWidth="10.0" prefWidth="119.0" />
+                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="191.0" minWidth="10.0" prefWidth="191.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label text="Lease_no" />
+                                                                  <Label text="Client_no" GridPane.rowIndex="1" />
+                                                                  <Label text="Property_no" GridPane.rowIndex="2" />
+                                                                  <Label text="Rent" GridPane.rowIndex="3" />
+                                                                  <Label text="Deposit" GridPane.rowIndex="4" />
+                                                                  <Label text="Whether Despoit" GridPane.columnIndex="2" />
+                                                                  <Label text="Payment" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                  <Label text="Lease length" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                  <Label text="Lease Start Date" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                  <Label text="Lease End Date" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                  <TextField fx:id="inputLeaseNo" GridPane.columnIndex="1" />
+                                                                  <ChoiceBox fx:id="inputLeaseClientNo" prefHeight="24.0" prefWidth="167.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <ChoiceBox fx:id="inputLeasePropertyNo" prefHeight="24.0" prefWidth="169.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                                  <TextField fx:id="inputLeaseRent" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                  <TextField fx:id="inputLeaseDeposit" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                                  <ChoiceBox fx:id="inputLeasePayment" prefHeight="24.0" prefWidth="187.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="inputLeaseLength" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                                  <TextField fx:id="inputLeaseStartDate" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                                  <TextField fx:id="inputLeaseEndDate" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                                  <Button fx:id="inputLeaseAdBut" mnemonicParsing="false" onAction="#LeaseInputAdd" prefHeight="24.0" prefWidth="64.0" text="Add" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                  <ChoiceBox fx:id="inputLeaseWhetherDeposit" prefHeight="24.0" prefWidth="186.0" GridPane.columnIndex="3" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </Tab>
+                                                <Tab fx:id="tabInputAd" onSelectionChanged="#BranchInputChanged" text="Input Ad">
+                                                   <content>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane layoutX="34.0" layoutY="62.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="136.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="454.00000762939453" minWidth="10.0" prefWidth="442.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label text="Newspaper Name" />
+                                                                  <Label text="Advertisement Date" GridPane.rowIndex="1" />
+                                                                  <Label text="Property no" GridPane.rowIndex="2" />
+                                                                  <Label text="Advertisement Rent" GridPane.rowIndex="3" />
+                                                                  <ChoiceBox fx:id="inputAdNewspaperName" prefHeight="24.0" prefWidth="440.0" GridPane.columnIndex="1" />
+                                                                  <ChoiceBox fx:id="inputAdPropertyNo" prefHeight="24.0" prefWidth="439.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                                  <TextField fx:id="inputAdDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="inputAdRent" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                  <Button fx:id="inputAdAddBut" mnemonicParsing="false" onAction="#AdInputAdd" prefHeight="24.0" prefWidth="66.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </Tab>
+                                            </tabs>
+                                          </TabPane>
+                                       </children></AnchorPane>
                               </content>
                             </TitledPane>
-                            <TitledPane animated="false" text="untitled 3">
+                            <TitledPane animated="false" text="Delete">
                               <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TabPane prefHeight="294.0" prefWidth="598.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <tabs>
+                                              <Tab fx:id="tabDeleteBranch" onSelectionChanged="#BranchDeleteChanged" text="Delete Branch">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <GridPane layoutX="97.0" layoutY="98.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="134.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="444.0" minWidth="10.0" prefWidth="444.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label text="Branch_no" />
+                                                                  <Label text="Street" GridPane.rowIndex="1" />
+                                                                  <Label text="City" GridPane.rowIndex="2" />
+                                                                  <Label text="Postcode" GridPane.rowIndex="3" />
+                                                                  <ChoiceBox fx:id="deleteBranchNo" prefHeight="24.0" prefWidth="441.0" GridPane.columnIndex="1" />
+                                                                  <Label fx:id="deleteBranchStreet" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                  <Label fx:id="deleteBranchCity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                                  <Label fx:id="deleteBranchPostcode" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                  <Button fx:id="deleteBranchButton" mnemonicParsing="false" onAction="#DeleteBranchButton" text="Delete" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                                  <Button fx:id="deleteBranchDetailButton" mnemonicParsing="false" onAction="#DeleteBranchDetailButton" text="Detail" GridPane.rowIndex="4" />
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                              <Tab fx:id="tabDeleteStaff" onSelectionChanged="#BranchDeleteChanged" text="Delete Staff">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <BorderPane layoutX="156.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <top>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                    <columnConstraints>
+                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="108.99999237060547" />
+                                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="469.00000762939453" minWidth="10.0" prefWidth="469.00000762939453" />
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                    </rowConstraints>
+                                                                     <children>
+                                                                        <Label text="Staff no" />
+                                                                        <ChoiceBox fx:id="deleteStaffNo" prefHeight="24.0" prefWidth="435.0" GridPane.columnIndex="1" />
+                                                                     </children>
+                                                                  </GridPane>
+                                                               </top>
+                                                               <center>
+                                                                  <TextArea fx:id="deleteStaffContext" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                               </center>
+                                                               <bottom>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                    <columnConstraints>
+                                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                    </rowConstraints>
+                                                                     <children>
+                                                                        <Button fx:id="deleteStaffDetailButton" mnemonicParsing="false" onAction="#DeleteStaffDetailButton" text="Detail" />
+                                                                        <Button fx:id="deleteStaffButton" mnemonicParsing="false" onAction="#DeleteStaffButton" text="Delete" GridPane.columnIndex="1" />
+                                                                     </children>
+                                                                  </GridPane>
+                                                               </bottom>
+                                                            </BorderPane>
+                                                         </children></AnchorPane>
+                                                </content>
+                                              </Tab>
+                                            </tabs>
+                                          </TabPane>
+                                       </children></AnchorPane>
                               </content>
                             </TitledPane>
                           </panes>
