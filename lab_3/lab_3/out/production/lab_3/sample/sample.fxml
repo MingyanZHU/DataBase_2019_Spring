@@ -330,6 +330,95 @@
                                                          </children></AnchorPane>
                                                 </content>
                                               </Tab>
+                                                <Tab fx:id="tabDeleteLease" onSelectionChanged="#BranchDeleteChanged" text="Delete Lease">
+                                                   <content>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <BorderPane layoutX="156.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <bottom>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                     <children>
+                                                                        <Button fx:id="deleteLeaseDetailButton" mnemonicParsing="false" onAction="#DeleteLeaseDetailButton" text="Detail" />
+                                                                        <Button fx:id="deleteLeaseButton" mnemonicParsing="false" onAction="#DeleteLeaseButton" text="Delete" GridPane.columnIndex="1" />
+                                                                     </children>
+                                                                     <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                     </columnConstraints>
+                                                                     <rowConstraints>
+                                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                     </rowConstraints>
+                                                                  </GridPane>
+                                                               </bottom>
+                                                               <center>
+                                                                  <TextArea fx:id="deleteLeaseContext" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                               </center>
+                                                               <top>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                     <children>
+                                                                        <Label text="Lease No" />
+                                                                        <ChoiceBox fx:id="deleteLeaseNo" prefHeight="24.0" prefWidth="435.0" GridPane.columnIndex="1" />
+                                                                     </children>
+                                                                     <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="108.99999237060547" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="469.00000762939453" minWidth="10.0" prefWidth="469.00000762939453" />
+                                                                     </columnConstraints>
+                                                                     <rowConstraints>
+                                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                     </rowConstraints>
+                                                                  </GridPane>
+                                                               </top>
+                                                            </BorderPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </Tab>
+                                                <Tab fx:id="tabDeleteAd" onSelectionChanged="#BranchDeleteChanged" text="Delete Advertisement">
+                                                   <content>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <BorderPane layoutX="156.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <bottom>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                     <children>
+                                                                        <Button fx:id="deleteAdDetailButton" mnemonicParsing="false" onAction="#DeleteAdDetailButton" text="Detail" />
+                                                                        <Button fx:id="deleteAdButton" mnemonicParsing="false" onAction="#DeleteAdButton" text="Delete" GridPane.columnIndex="1" />
+                                                                     </children>
+                                                                     <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                     </columnConstraints>
+                                                                     <rowConstraints>
+                                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                     </rowConstraints>
+                                                                  </GridPane>
+                                                               </bottom>
+                                                               <center>
+                                                                  <TextArea fx:id="deleteAdContext" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                               </center>
+                                                               <top>
+                                                                  <GridPane BorderPane.alignment="CENTER">
+                                                                     <children>
+                                                                        <Label text="Newspaper Name" />
+                                                                        <ChoiceBox fx:id="deleteAdNewspaperName" prefHeight="24.0" prefWidth="435.0" GridPane.columnIndex="1" />
+                                                                        <Label text="Advertisement" GridPane.rowIndex="1" />
+                                                                        <ChoiceBox fx:id="deleteAdDate" prefHeight="24.0" prefWidth="435.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                                     </children>
+                                                                     <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="108.99999237060547" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="469.00000762939453" minWidth="10.0" prefWidth="469.00000762939453" />
+                                                                     </columnConstraints>
+                                                                     <rowConstraints>
+                                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                     </rowConstraints>
+                                                                  </GridPane>
+                                                               </top>
+                                                            </BorderPane>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </Tab>
                                             </tabs>
                                           </TabPane>
                                        </children></AnchorPane>

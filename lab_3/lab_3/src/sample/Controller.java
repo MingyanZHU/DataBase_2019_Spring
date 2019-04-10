@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.*;
 
@@ -8,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static sample.Main.connection;
 import static sample.Main.statement;
@@ -67,6 +70,15 @@ public class Controller {
     public Button searchBranchButton = new Button();
     public Tab overAverageAdProperty = new Tab();
     public TextArea overAverageAnswer = new TextArea();
+    public Tab tabDeleteLease = new Tab();
+    public Button deleteLeaseDetailButton = new Button();
+    public Button deleteLeaseButton = new Button();
+    public TextArea deleteLeaseContext = new TextArea();
+    public ChoiceBox deleteLeaseNo = new ChoiceBox();
+    public Tab tabDeleteAd = new Tab();
+    public ChoiceBox deleteAdNewspaperName = new ChoiceBox();
+    public ChoiceBox deleteAdDate = new ChoiceBox();
+    public TextArea deleteAdContext = new TextArea();
 
 
     private void formatErrorAlert(String errorMessage) {
@@ -190,6 +202,35 @@ public class Controller {
             resultSet.close();
 
             deleteStaffContext.setEditable(false);
+            deleteStaffContext.setText("");
+        } else if (tabDeleteLease.isSelected()) {
+            String sql = "select Lease_no from Lease;";
+            ResultSet resultSet = statement.executeQuery(sql);
+            List<String> leaseNo = new ArrayList<>();
+            while (resultSet.next()) {
+                leaseNo.add(resultSet.getString("Lease_no"));
+            }
+            deleteLeaseNo.setItems(FXCollections.observableArrayList(leaseNo));
+            resultSet.close();
+
+            deleteLeaseContext.setEditable(false);
+            deleteLeaseContext.setText("");
+        } else if (tabDeleteAd.isSelected()) {
+            String sql = "select * from Advertisement";
+            ResultSet resultSet = statement.executeQuery(sql);
+            Set<String> date = new HashSet<>();
+            Set<String> newspaper = new HashSet<>();
+            while (resultSet.next()) {
+                date.add(resultSet.getString("Ad_date"));
+                newspaper.add(resultSet.getString("Newspaper_name"));
+            }
+            deleteAdDate.setItems(FXCollections.observableArrayList(date));
+            deleteAdNewspaperName.setItems(FXCollections.observableArrayList(newspaper));
+
+            resultSet.close();
+
+            deleteAdContext.setEditable(false);
+            deleteAdContext.setText("");
         }
     }
 
@@ -204,9 +245,9 @@ public class Controller {
             resultSet.close();
 
             searchBranchAnswer.setEditable(false);
-        } else if (overAverageAdProperty.isSelected()){
-            String sql = ""; // TODO 嵌套查询
-//            ResultSet resultSet = statement.executeQuery(sql);
+        } else if (overAverageAdProperty.isSelected()) {
+            String sql = "select * from PropertyForRent where "; // TODO 嵌套查询
+            ResultSet resultSet = statement.executeQuery(sql);
             constraintViolation("TODO!!!!");
             overAverageAnswer.setEditable(false);
         }
@@ -219,8 +260,8 @@ public class Controller {
             ResultSet resultSet = statement.executeQuery(sql);
             int columns = resultSet.getMetaData().getColumnCount();
             StringBuilder builder = new StringBuilder();
-            while (resultSet.next()){
-                for(int i = 1;i<columns;i++){
+            while (resultSet.next()) {
+                for (int i = 1; i < columns; i++) {
                     builder.append(resultSet.getString(i) + "|");
                 }
                 builder.append("\n");
@@ -271,36 +312,44 @@ public class Controller {
     public void DeleteStaffButton() {
         String staff_no = (String) deleteStaffNo.getSelectionModel().getSelectedItem();
         String sql = "delete from Staff where Staff_no = ?";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, staff_no);
+        if (staff_no == null) {
+            constraintViolation("staff_no is empty!");
+        } else {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, staff_no);
 
-            preparedStatement.execute();
+                preparedStatement.execute();
 
-            successDeleteTuple();
-        } catch (SQLException e) {
-            if (e.getMessage().contains("foreign"))
-                constraintViolation("由于外键约束不能删除!");
-            else
-                constraintViolation(e.getMessage());
+                successDeleteTuple();
+            } catch (SQLException e) {
+                if (e.getMessage().contains("foreign"))
+                    constraintViolation("由于外键约束不能删除!");
+                else
+                    constraintViolation(e.getMessage());
+            }
         }
     }
 
     public void DeleteBranchButton() {
         String branch_no = (String) deleteBranchNo.getSelectionModel().getSelectedItem();
         String sql = "delete from Branch where Branch_no = ?";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, branch_no);
+        if (branch_no == null) {
+            constraintViolation("Branch_no is empty!");
+        } else {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, branch_no);
 
-            preparedStatement.execute();
+                preparedStatement.execute();
 
-            successDeleteTuple();
-        } catch (SQLException e) {
-            if (e.getMessage().contains("foreign"))
-                constraintViolation("由于外键约束不能删除!");
-            else
-                constraintViolation(e.getMessage());
+                successDeleteTuple();
+            } catch (SQLException e) {
+                if (e.getMessage().contains("foreign"))
+                    constraintViolation("由于外键约束不能删除!");
+                else
+                    constraintViolation(e.getMessage());
+            }
         }
     }
 
@@ -428,4 +477,104 @@ public class Controller {
         }
     }
 
+    public void DeleteLeaseDetailButton() {
+        String leaseNo = (String) deleteLeaseNo.getSelectionModel().getSelectedItem();
+        String sql = "select * from Lease where Lease_no = \"" + leaseNo + "\";";
+        try {
+            ResultSet resultSet = statement.executeQuery(sql);
+            int columns = resultSet.getMetaData().getColumnCount();
+            StringBuilder stringBuilder = new StringBuilder();
+            while (resultSet.next()) {
+                for (int i = 1; i < columns; i++)
+                    stringBuilder.append(resultSet.getString(i) + "|");
+                stringBuilder.append("\n");
+            }
+            resultSet.close();
+            deleteLeaseContext.setText(stringBuilder.toString());
+        } catch (SQLException e) {
+            constraintViolation(e.getMessage());
+        }
+
+    }
+
+    public void DeleteLeaseButton() {
+        String leaseNo = (String) deleteLeaseNo.getSelectionModel().getSelectedItem();
+        String sql = "delete from Lease where Lease_no = ?";
+        if (leaseNo == null) {
+            constraintViolation("Lease No is empty!");
+        } else {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, leaseNo);
+                preparedStatement.execute();
+
+                successDeleteTuple();
+            } catch (SQLException e) {
+                if (e.getMessage().contains("foreign"))
+                    constraintViolation("由于外键约束不能删除");
+                else
+                    constraintViolation(e.getMessage());
+            }
+        }
+    }
+
+    public void DeleteAdButton() {
+        String date = (String) deleteAdDate.getSelectionModel().getSelectedItem();
+        String newspaper = (String) deleteAdNewspaperName.getSelectionModel().getSelectedItem();
+        String sql = "";
+        PreparedStatement preparedStatement;
+        try {
+
+            if (date == null && newspaper == null) {
+                constraintViolation("Date is null and newspaper is null");
+                return;
+            } else if (date == null) {
+                sql = "delete from Advertisement where Newspaper_name = ?";
+                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, newspaper);
+            } else if (newspaper == null) {
+                sql = "delete from Advertisement where Ad_date = ?";
+                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, date);
+            } else {
+                sql = "delete from Advertisement where  Newspaper_name = ? and Ad_date = ?";
+                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, newspaper);
+                preparedStatement.setString(2, date);
+            }
+            preparedStatement.execute();
+
+            successDeleteTuple();
+        } catch (SQLException e) {
+            if (e.getMessage().contains("foreign"))
+                constraintViolation("由于外键约束不能删除！");
+            else
+                constraintViolation(e.getMessage());
+        }
+    }
+
+    public void DeleteAdDetailButton() throws SQLException {
+        String date = (String) deleteAdDate.getSelectionModel().getSelectedItem();
+        String newspaper = (String) deleteAdNewspaperName.getSelectionModel().getSelectedItem();
+        String sql = "";
+        if(date == null && newspaper == null){
+            return;
+        } else if(date == null){
+            sql = "select * from Advertisement where Newspaper_name = \"" + newspaper + "\"";
+        } else if(newspaper == null){
+            sql = "select * from Advertisement where Ad_date = \"" + date + "\"";
+        } else {
+            sql = "select * from Advertisement where Ad_date = \"" + date + "\"" + "and Newspaper_name = \"" + newspaper + "\"";
+        }
+        ResultSet resultSet = statement.executeQuery(sql);
+        StringBuilder stringBuilder = new StringBuilder();
+        int columns = resultSet.getMetaData().getColumnCount();
+        while (resultSet.next()){
+            for(int i = 1;i<columns;i++)
+                stringBuilder.append(resultSet.getString(i) + "|");
+            stringBuilder.append("\n");
+        }
+        deleteAdContext.setText(stringBuilder.toString());
+        resultSet.close();
+    }
 }

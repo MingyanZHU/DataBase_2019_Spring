@@ -79,7 +79,7 @@
 					\node[attribute] (monthly_rent) [below right=of property] {每月租金} edge (property);
 					% \node[attribute] (owner_numebr) [below right=of property] {业主编号} edge (property);
 
-					\node[relationship] (have) [below=of property] {有} edge node [auto] {1} (property);
+					\node[relationship] (have) [below=of property] {有} edge node [auto] {m} (property);
 
 					\node[entity] (property_owners) [below=of have] {业主} edge node[auto] {1} (have);
 					\node[attribute] (property_owners_number) [right=of property_owners] {\key{业主编号}} edge (property_owners);
