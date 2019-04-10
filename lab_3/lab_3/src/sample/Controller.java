@@ -68,8 +68,8 @@ public class Controller {
     public ChoiceBox searchBranchCity = new ChoiceBox();
     public TextArea searchBranchAnswer = new TextArea();
     public Button searchBranchButton = new Button();
-    public Tab overAverageAdProperty = new Tab();
-    public TextArea overAverageAnswer = new TextArea();
+    public Tab searchPropertyInAd = new Tab();
+    public TextArea searchPropertyInAdAnswer = new TextArea();
     public Tab tabDeleteLease = new Tab();
     public Button deleteLeaseDetailButton = new Button();
     public Button deleteLeaseButton = new Button();
@@ -79,6 +79,16 @@ public class Controller {
     public ChoiceBox deleteAdNewspaperName = new ChoiceBox();
     public ChoiceBox deleteAdDate = new ChoiceBox();
     public TextArea deleteAdContext = new TextArea();
+    public Tab searchStaffInfo = new Tab();
+    public TextArea searchStaffInfoAnswer = new TextArea();
+    public Tab searchBusinessTab = new Tab();
+    public TextArea searchBusinessInfoAnswer = new TextArea();
+    public Tab tabIndex = new Tab();
+    public TextArea staffIndexInfo = new TextArea();
+    public Button delIndex = new Button();
+    public Button addIndex = new Button();
+    public TextArea salaryAns = new TextArea();
+    public Tab tabTrigger = new Tab();
 
 
     private void formatErrorAlert(String errorMessage) {
@@ -114,6 +124,17 @@ public class Controller {
         alert.setTitle("Delete Successfully");
         alert.setContentText("删除成功!!!");
         alert.showAndWait();
+    }
+
+    private boolean areYouSureDelTuple() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("You will del some tuple(s), are you sure?");
+        alert.showAndWait();
+        if (alert.getResult() == ButtonType.YES)
+            return true;
+        else
+            return false;
     }
 
     public void BranchInputChanged(Event event) throws SQLException {
@@ -245,11 +266,46 @@ public class Controller {
             resultSet.close();
 
             searchBranchAnswer.setEditable(false);
-        } else if (overAverageAdProperty.isSelected()) {
-            String sql = "select * from PropertyForRent where "; // TODO 嵌套查询
+        } else if (searchPropertyInAd.isSelected()) {
+            String sql = "select * from PropertyForRent where Property_no in (" +
+                    "select distinct Property_no from Advertisement )";
             ResultSet resultSet = statement.executeQuery(sql);
-            constraintViolation("TODO!!!!");
-            overAverageAnswer.setEditable(false);
+            StringBuilder stringBuilder = new StringBuilder();
+            int columns = resultSet.getMetaData().getColumnCount();
+            while (resultSet.next()) {
+                for (int i = 1; i < columns; i++)
+                    stringBuilder.append(resultSet.getString(i)).append("|");
+                stringBuilder.append("\n");
+            }
+            searchPropertyInAdAnswer.setEditable(false);
+            searchPropertyInAdAnswer.setText(stringBuilder.toString());
+        } else if (searchStaffInfo.isSelected()) {
+            String sql = "select Staff_name, Staff_position, Staff_salary, count(PropertyForRent.Property_no) cc from Staff, PropertyForRent where Staff.Staff_no = PropertyForRent.Staff_no group by Staff.Staff_no";
+            ResultSet resultSet = statement.executeQuery(sql);
+            int columns = resultSet.getMetaData().getColumnCount();
+            StringBuilder stringBuilder = new StringBuilder();
+            while (resultSet.next()) {
+                for (int i = 1; i < columns; i++) {
+                    stringBuilder.append(resultSet.getString(i) + "|");
+                }
+                stringBuilder.append(resultSet.getString("cc"));
+                stringBuilder.append("\n");
+            }
+            searchStaffInfoAnswer.setEditable(false);
+            searchStaffInfoAnswer.setText(stringBuilder.toString());
+        } else if (searchBusinessTab.isSelected()) {
+            String sql = "select * from PropertyForRent where Owner_no in (select Owner_no from BusinessOwner)";
+            ResultSet resultSet = statement.executeQuery(sql);
+            int columns = resultSet.getMetaData().getColumnCount();
+            StringBuilder stringBuilder = new StringBuilder();
+            while (resultSet.next()) {
+                for (int i = 1; i < columns; i++)
+                    stringBuilder.append(resultSet.getString(i)).append("|");
+                stringBuilder.append("\n");
+            }
+
+            searchBusinessInfoAnswer.setEditable(false);
+            searchBusinessInfoAnswer.setText(stringBuilder.toString());
         }
     }
 
@@ -315,6 +371,8 @@ public class Controller {
         if (staff_no == null) {
             constraintViolation("staff_no is empty!");
         } else {
+            if(!areYouSureDelTuple())
+                return;
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, staff_no);
@@ -337,6 +395,8 @@ public class Controller {
         if (branch_no == null) {
             constraintViolation("Branch_no is empty!");
         } else {
+            if(!areYouSureDelTuple())
+                return;
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, branch_no);
@@ -503,6 +563,8 @@ public class Controller {
         if (leaseNo == null) {
             constraintViolation("Lease No is empty!");
         } else {
+            if(!areYouSureDelTuple())
+                return;
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, leaseNo);
@@ -524,7 +586,6 @@ public class Controller {
         String sql = "";
         PreparedStatement preparedStatement;
         try {
-
             if (date == null && newspaper == null) {
                 constraintViolation("Date is null and newspaper is null");
                 return;
@@ -542,6 +603,8 @@ public class Controller {
                 preparedStatement.setString(1, newspaper);
                 preparedStatement.setString(2, date);
             }
+            if(!areYouSureDelTuple())
+                return;
             preparedStatement.execute();
 
             successDeleteTuple();
@@ -557,11 +620,11 @@ public class Controller {
         String date = (String) deleteAdDate.getSelectionModel().getSelectedItem();
         String newspaper = (String) deleteAdNewspaperName.getSelectionModel().getSelectedItem();
         String sql = "";
-        if(date == null && newspaper == null){
+        if (date == null && newspaper == null) {
             return;
-        } else if(date == null){
+        } else if (date == null) {
             sql = "select * from Advertisement where Newspaper_name = \"" + newspaper + "\"";
-        } else if(newspaper == null){
+        } else if (newspaper == null) {
             sql = "select * from Advertisement where Ad_date = \"" + date + "\"";
         } else {
             sql = "select * from Advertisement where Ad_date = \"" + date + "\"" + "and Newspaper_name = \"" + newspaper + "\"";
@@ -569,12 +632,80 @@ public class Controller {
         ResultSet resultSet = statement.executeQuery(sql);
         StringBuilder stringBuilder = new StringBuilder();
         int columns = resultSet.getMetaData().getColumnCount();
-        while (resultSet.next()){
-            for(int i = 1;i<columns;i++)
+        while (resultSet.next()) {
+            for (int i = 1; i < columns; i++)
                 stringBuilder.append(resultSet.getString(i) + "|");
             stringBuilder.append("\n");
         }
         deleteAdContext.setText(stringBuilder.toString());
         resultSet.close();
+    }
+
+    public void TabsIndexTriggers() throws SQLException {
+        if (tabIndex.isSelected()) {
+//            String sql = "Show index from ";
+            ResultSet resultSet = connection.getMetaData().getIndexInfo(null, null, "Staff", false, false);
+            StringBuilder stringBuilder = new StringBuilder();
+            int columns = resultSet.getMetaData().getColumnCount();
+            while (resultSet.next()) {
+                for (int i = 1; i < columns; i++)
+                    stringBuilder.append(resultSet.getString(i)).append("|");
+                stringBuilder.append("\n");
+            }
+            staffIndexInfo.setEditable(false);
+            staffIndexInfo.setText(stringBuilder.toString());
+        } else if (tabTrigger.isSelected()) {
+            String sql = "select Staff_name, Staff_salary from Staff";
+            ResultSet resultSet = statement.executeQuery(sql);
+            StringBuilder stringBuilder = new StringBuilder();
+            while (resultSet.next()) {
+                stringBuilder.append(resultSet.getString("Staff_name")).append("|").append(resultSet.getString("Staff_salary")).append("\n");
+            }
+
+            salaryAns.setEditable(false);
+            salaryAns.setText(stringBuilder.toString());
+        }
+    }
+
+    public void DelIndex() {
+        try {
+            String sql = "alter table Staff drop Index Staff_name";
+            statement.execute(sql);
+
+            TabsIndexTriggers();
+        } catch (SQLException e) {
+            constraintViolation(e.getMessage());
+        }
+    }
+
+    public void AddIndex() {
+        try {
+            String sql = "alter table Staff add Index (Staff_name)";
+            statement.execute(sql);
+
+            TabsIndexTriggers();
+        } catch (SQLException e) {
+            constraintViolation(e.getMessage());
+        }
+    }
+
+    public void decreaseSalary() throws SQLException {
+        String sql = "update Staff set Staff_salary = Staff_salary - 1000";
+        statement.execute(sql);
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("要给每人降1000块工资(你是强东吗??)!");
+        alert.showAndWait();
+        TabsIndexTriggers();
+    }
+
+    public void increaseSalary() throws SQLException {
+        String sql = "update Staff set Staff_salary = Staff_salary + 1000";
+        statement.execute(sql);
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("要给每人涨1000块!");
+        alert.showAndWait();
+        TabsIndexTriggers();
     }
 }
