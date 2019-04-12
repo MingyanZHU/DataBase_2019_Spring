@@ -131,10 +131,7 @@ public class Controller {
         alert.setTitle("Are you sure?");
         alert.setContentText("You will del some tuple(s), are you sure?");
         alert.showAndWait();
-        if (alert.getResult() == ButtonType.YES)
-            return true;
-        else
-            return false;
+        return alert.getResult() == ButtonType.OK;
     }
 
     public void BranchInputChanged(Event event) throws SQLException {
@@ -188,7 +185,7 @@ public class Controller {
             inputLeaseWhetherDeposit.setItems(FXCollections.observableArrayList("Yes", "No"));
         } else if (tabInputStaff.isSelected()) {
             inputStaffNo.setPromptText("SXxx, X is capital, xx is number");
-            inputStaffPosition.setItems(FXCollections.observableArrayList("Manager", "Assistant"));
+            inputStaffPosition.setItems(FXCollections.observableArrayList("Director", "Assistant"));
             inputStaffGender.setItems(FXCollections.observableArrayList("M", "F", "X"));
             inputStaffSalary.setPromptText("Positive Number($)");
 
@@ -311,7 +308,7 @@ public class Controller {
 
     public void searchBranchButton() {
         String city = (String) searchBranchCity.getSelectionModel().getSelectedItem();
-        String sql = "select * from Branch where City = \"" + city + "\"";
+        String sql = "select Branch.Branch_no, Branch.Street, Branch.City, Branch.Postcode, Branch_Tel.Tel from Branch, Branch_Tel where City = \"" + city + "\" and Branch.Branch_no = Branch_Tel.Branch_no";
         try {
             ResultSet resultSet = statement.executeQuery(sql);
             int columns = resultSet.getMetaData().getColumnCount();
@@ -320,6 +317,7 @@ public class Controller {
                 for (int i = 1; i < columns; i++) {
                     builder.append(resultSet.getString(i) + "|");
                 }
+                builder.append(resultSet.getString("Tel"));
                 builder.append("\n");
             }
             resultSet.close();
@@ -371,14 +369,14 @@ public class Controller {
         if (staff_no == null) {
             constraintViolation("staff_no is empty!");
         } else {
-            if(!areYouSureDelTuple())
+            if (!areYouSureDelTuple())
                 return;
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, staff_no);
 
                 preparedStatement.execute();
-
+                BranchDeleteChanged();
                 successDeleteTuple();
             } catch (SQLException e) {
                 if (e.getMessage().contains("foreign"))
@@ -395,14 +393,14 @@ public class Controller {
         if (branch_no == null) {
             constraintViolation("Branch_no is empty!");
         } else {
-            if(!areYouSureDelTuple())
+            if (!areYouSureDelTuple())
                 return;
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, branch_no);
 
                 preparedStatement.execute();
-
+                BranchDeleteChanged();
                 successDeleteTuple();
             } catch (SQLException e) {
                 if (e.getMessage().contains("foreign"))
@@ -434,7 +432,8 @@ public class Controller {
 
             successAddTuple();
         } catch (SQLException e) {
-            constraintViolation("Input Advertisement Failed!");
+            constraintViolation(e.getMessage());
+//            constraintViolation("Input Advertisement Failed!");
         }
 //        catch (ParseException e) {
 ////            e.printStackTrace();
@@ -448,7 +447,8 @@ public class Controller {
         String propertyNo = (String) inputLeasePropertyNo.getSelectionModel().getSelectedItem();
         String rent = inputLeaseRent.getText();
         String deposit = inputLeaseDeposit.getText();
-        String whether = ((String) inputLeaseWhetherDeposit.getSelectionModel().getSelectedItem()).substring(0, 1);
+        String whether = (String) inputLeaseWhetherDeposit.getSelectionModel().getSelectedItem();
+        whether = whether == null ? null : whether.substring(0, 1);
         String payment = (String) inputLeasePayment.getSelectionModel().getSelectedItem();
         String leaseLength = inputLeaseLength.getText();
         String leaseStartDate = inputLeaseStartDate.getText();
@@ -474,9 +474,12 @@ public class Controller {
 
             successAddTuple();
         } catch (SQLException e) {
-            constraintViolation(e.getMessage());
+            if (e.getMessage().contains("user-defined exception"))
+                constraintViolation("定金为每月租金的3倍!");
+            else
+                constraintViolation(e.getMessage());
         } catch (NumberFormatException e) {
-            formatErrorAlert("Rent " + rent + ", Deposit " + deposit);
+            formatErrorAlert("Rent:" + rent + ", Deposit:" + deposit);
         }
     }
 
@@ -502,13 +505,18 @@ public class Controller {
             preparedStatement.setInt(6, Integer.valueOf(staffSalary));
             preparedStatement.setString(7, staffBranch);
 
-            if (staffSuperior != null && staffBranch.length() != 0)
+            if (staffSuperior != null && staffSuperior.length() != 0) {
                 preparedStatement.setString(5, staffSuperior);
+            } else
+                preparedStatement.setString(5, "");
             preparedStatement.executeUpdate();
 
             successAddTuple();
         } catch (SQLException e) {
-            constraintViolation(e.getMessage());
+            if (e.getMessage().contains("user-defined exception"))
+                constraintViolation("Staff_name 不能为空且员工工资不能低于9000元!");
+            else
+                constraintViolation(e.getMessage());
         } catch (NumberFormatException e) {
             formatErrorAlert("Salary " + staffSalary);
         }
@@ -533,7 +541,10 @@ public class Controller {
 
             successAddTuple();
         } catch (SQLException e) {
-            constraintViolation(e.getMessage());
+            if (e.getMessage().contains("user-defined exception"))
+                constraintViolation("Branch_no, Street, City, Postcode均不能为空");
+            else
+                constraintViolation(e.getMessage());
         }
     }
 
@@ -563,13 +574,13 @@ public class Controller {
         if (leaseNo == null) {
             constraintViolation("Lease No is empty!");
         } else {
-            if(!areYouSureDelTuple())
+            if (!areYouSureDelTuple())
                 return;
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, leaseNo);
                 preparedStatement.execute();
-
+                BranchDeleteChanged();
                 successDeleteTuple();
             } catch (SQLException e) {
                 if (e.getMessage().contains("foreign"))
@@ -603,10 +614,10 @@ public class Controller {
                 preparedStatement.setString(1, newspaper);
                 preparedStatement.setString(2, date);
             }
-            if(!areYouSureDelTuple())
+            if (!areYouSureDelTuple())
                 return;
             preparedStatement.execute();
-
+            BranchDeleteChanged();
             successDeleteTuple();
         } catch (SQLException e) {
             if (e.getMessage().contains("foreign"))
