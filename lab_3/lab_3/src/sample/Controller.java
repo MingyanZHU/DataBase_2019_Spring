@@ -1,7 +1,6 @@
 package sample;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.*;
 
@@ -89,6 +88,8 @@ public class Controller {
     public Button addIndex = new Button();
     public TextArea salaryAns = new TextArea();
     public Tab tabTrigger = new Tab();
+    public Tab searchViewTab = new Tab();
+    public TextArea searchViewAnswer = new TextArea();
 
 
     private void formatErrorAlert(String errorMessage) {
@@ -303,6 +304,21 @@ public class Controller {
 
             searchBusinessInfoAnswer.setEditable(false);
             searchBusinessInfoAnswer.setText(stringBuilder.toString());
+        } else if (searchViewTab.isSelected()) {
+            String sql = "select * FROM ViewingInfo";
+            ResultSet resultSet = statement.executeQuery(sql);
+            int columns = resultSet.getMetaData().getColumnCount();
+            StringBuilder stringBuilder = new StringBuilder();
+            while (resultSet.next()){
+                for(int i = 1;i<columns;i++){
+                    stringBuilder.append(resultSet.getString(i)).append("|");
+                }
+                stringBuilder.append(resultSet.getString("Tel_no"));
+                stringBuilder.append("\n");
+            }
+
+            searchViewAnswer.setEditable(false);
+            searchViewAnswer.setText(stringBuilder.toString());
         }
     }
 

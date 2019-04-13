@@ -82,6 +82,15 @@
                                                       </AnchorPane>
                                                    </content>
                                                 </Tab>
+                                                <Tab fx:id="searchViewTab" onSelectionChanged="#BranchSearchChanged" text="Viewing Info">
+                                                   <content>
+                                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <TextArea fx:id="searchViewAnswer" layoutX="189.0" prefHeight="241.0" prefWidth="578.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </Tab>
                                             </tabs>
                                           </TabPane>
                                        </children>
@@ -463,8 +472,8 @@
                                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                     </rowConstraints>
                                                                      <children>
-                                                                        <Button mnemonicParsing="false" text="Add Index In Staff Name" onAction="#AddIndex"/>
-                                                                        <Button mnemonicParsing="false" text="Delete Extra Index" GridPane.columnIndex="1" onAction="#DelIndex"/>
+                                                                        <Button mnemonicParsing="false" onAction="#AddIndex" text="Add Index In Staff Name" />
+                                                                        <Button mnemonicParsing="false" onAction="#DelIndex" text="Delete Extra Index" GridPane.columnIndex="1" />
                                                                      </children>
                                                                   </GridPane>
                                                                </bottom>
@@ -476,7 +485,7 @@
                                                       </AnchorPane>
                                                 </content>
                                               </Tab>
-                                              <Tab text="Salary Change" fx:id="tabTrigger" onSelectionChanged="#TabsIndexTriggers">
+                                              <Tab fx:id="tabTrigger" onSelectionChanged="#TabsIndexTriggers" text="Salary Change">
                                                 <content>
                                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                          <children>
@@ -494,8 +503,8 @@
                                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                     </rowConstraints>
                                                                      <children>
-                                                                        <Button fx:id="increaseSalary" mnemonicParsing="false" text="Salary Increase" onAction="#increaseSalary"/>
-                                                                        <Button fx:id="decreaseSalary" mnemonicParsing="false" text="Salary Decrease" GridPane.columnIndex="1" onAction="#decreaseSalary"/>
+                                                                        <Button fx:id="increaseSalary" mnemonicParsing="false" onAction="#increaseSalary" text="Salary Increase" />
+                                                                        <Button fx:id="decreaseSalary" mnemonicParsing="false" onAction="#decreaseSalary" text="Salary Decrease" GridPane.columnIndex="1" />
                                                                      </children>
                                                                   </GridPane>
                                                                </bottom>
