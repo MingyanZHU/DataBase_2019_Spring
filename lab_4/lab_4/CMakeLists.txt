@@ -6,4 +6,4 @@ set(CMAKE_C_STANDARD 11)
 include_directories(.)
 
 add_executable(lab_4
-        extmem.c extmem.h test.c random_data.c random_data.h)
+        extmem.c extmem.h lab4.c random_data.c random_data.h)
