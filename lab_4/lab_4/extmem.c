@@ -117,11 +117,17 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf)
     blkPtr++;
     bytePtr = blkPtr;
 
-    while ((ch = fgetc(fp)) != EOF && bytePtr < blkPtr + buf->blkSize)
-    {
+//    while ((ch = fgetc(fp)) != EOF && bytePtr < blkPtr + buf->blkSize)
+//    {
+//        *bytePtr = ch;
+//        bytePtr++;
+//    }
+
+    do {
+        ch = fgetc(fp);
         *bytePtr = ch;
         bytePtr++;
-    }
+    } while (bytePtr < blkPtr + buf->blkSize);
 
     fclose(fp);
     buf->numFreeBlk--;
