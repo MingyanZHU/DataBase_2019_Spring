@@ -19,6 +19,7 @@ Buffer *initBuffer(size_t bufSize, size_t blkSize, Buffer *buf)
     buf->blkSize = blkSize;
     buf->numAllBlk = bufSize / (blkSize + 1);
     buf->numFreeBlk = buf->numAllBlk;
+    // TODO BUG numFreeBlk can be bigger than numAllBlk.
     buf->data = (unsigned char*)malloc(bufSize * sizeof(unsigned char));
 
     if (!buf->data)
@@ -105,7 +106,7 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf)
     }
 
     sprintf(filename, "%d.blk", addr);
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen(filename, "rb");
 
     if (!fp)
     {
@@ -117,17 +118,12 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf)
     blkPtr++;
     bytePtr = blkPtr;
 
-//    while ((ch = fgetc(fp)) != EOF && bytePtr < blkPtr + buf->blkSize)
-//    {
-//        *bytePtr = ch;
-//        bytePtr++;
-//    }
-
-    do {
+    while (bytePtr < blkPtr + buf->blkSize)
+    {
         ch = fgetc(fp);
         *bytePtr = ch;
         bytePtr++;
-    } while (bytePtr < blkPtr + buf->blkSize);
+    }
 
     fclose(fp);
     buf->numFreeBlk--;
@@ -141,7 +137,7 @@ int writeBlockToDisk(unsigned char *blkPtr, unsigned int addr, Buffer *buf)
     unsigned char *bytePtr;
 
     sprintf(filename, "%d.blk", addr);
-    FILE *fp = fopen(filename, "w");
+    FILE *fp = fopen(filename, "wb");
 
     if (!fp)
     {
