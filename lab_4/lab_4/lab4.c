@@ -29,6 +29,9 @@ int linearSearch(Buffer *buffer, unsigned int relation_addr);
 // output data
 int outputDataFromDisk(Buffer *buffer, unsigned int addr);
 
+// Fresh block in buffer, make them to 0.
+void freshBlockInBuffer(Buffer *buffer, unsigned char *blk);
+
 int main() {
     Buffer buffer;
     unsigned char *blk;
@@ -37,6 +40,7 @@ int main() {
         perror("Buffer Initialization Failed!\n");
         return -1;
     }
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
     blk = getNewBlockInBuffer(&buffer);
     // load Relation S to Disk
@@ -44,25 +48,32 @@ int main() {
         perror("Writing Relation S to Disk Failed!\n");
         return -1;
     }
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
+    blk = getNewBlockInBuffer(&buffer);
     // load Relation R to Disk
     if (loadRelationRToDisk(&buffer, blk) != 0) {
         perror("Writing Relation R to Disk Failed!\n");
         return -1;
     }
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
-//    freeBlockInBuffer(blk, &buffer);
-// TODO 此处不能去掉注释 可能是对于申请的用于读的block是不能free的
+    outputDataFromDisk(&buffer, s_start_addr);
+    printf("======================================\n");
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
-    if (linearSearch(&buffer, r_start_addr) != 0) {
+    if (linearSearch(&buffer, s_start_addr) != 0) {
         perror("Linear Search Failed\n");
         return -1;
     }
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
     if (outputDataFromDisk(&buffer, linear_search_answer_addr) != 0) {
         perror("Output Data From Disk Filed\n");
         return -1;
     }
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+
     return 0;
 }
 
@@ -88,8 +99,10 @@ int loadRelationSToDisk(Buffer *buffer, unsigned char *blk) {
             perror("Writing Block Failed!\n");
             return -1;
         }
+        blk = getNewBlockInBuffer(buffer);
         s_using += blkSize;
     }
+    freeBlockInBuffer(blk, buffer);
     return 0;
 }
 
@@ -114,8 +127,10 @@ int loadRelationRToDisk(Buffer *buffer, unsigned char *blk) {
             perror("Writing Block Failed!\n");
             return -1;
         }
+        blk = getNewBlockInBuffer(buffer);
         r_using += blkSize;
     }
+    freeBlockInBuffer(blk, buffer);
     return 0;
 }
 
@@ -136,17 +151,18 @@ int linearSearch(Buffer *buffer, unsigned int relation_addr) {
             memcpy(&x, (int *) tempRead, int_size);
             memcpy(&y, (int *) (tempRead + int_size), int_size);
             if (x == searchValue) {
-                memcpy(writeBuffer, (unsigned char *) &x, int_size);
-                memcpy(writeBuffer + int_size, (unsigned char *) &y, int_size);
+                memcpy(writeBuffer + writeBuffer_using, (unsigned char *) &x, int_size);
+                memcpy(writeBuffer + writeBuffer_using + int_size, (unsigned char *) &y, int_size);
                 writeBuffer_using += tuples_size;
                 if (writeBuffer_using + tuples_size >= blkSize) {
                     int temp_next_blk_addr = next_write_blk_addr + blkSize;
-                    memcpy(writeBuffer, (unsigned char *) &temp_next_blk_addr, int_size);
+                    memcpy(writeBuffer + writeBuffer_using, (unsigned char *) &temp_next_blk_addr, int_size);
                     if (writeBlockToDisk(writeBuffer, next_write_blk_addr, buffer) != 0) {
-                        freeBlockInBuffer(writeBuffer, buffer);
                         return -1;
                     }
                     next_write_blk_addr = temp_next_blk_addr;
+                    freshBlockInBuffer(buffer, writeBuffer);
+                    writeBuffer_using = 0;
                 }
             }
             tempRead += tuples_size;
@@ -162,16 +178,13 @@ int linearSearch(Buffer *buffer, unsigned int relation_addr) {
 
         if ((readBuffer = readBlockFromDisk(next_read_blk_addr, buffer)) == NULL) {
             perror("Reading Block Failed!\n");
-            freeBlockInBuffer(writeBuffer, buffer);
             return -1;
         }
     }
     memcpy(writeBuffer + blkSize - tuples_size, (unsigned char *) &end_blk_next_addr, int_size);
     if (writeBlockToDisk(writeBuffer, next_write_blk_addr, buffer) != 0) {
-        freeBlockInBuffer(writeBuffer, buffer);
         return -1;
     }
-    freeBlockInBuffer(writeBuffer, buffer);
     return 0;
 }
 
@@ -196,15 +209,21 @@ int outputDataFromDisk(Buffer *buffer, unsigned int addr) {
         printf("%d\n", next_blk_addr);
 
         // next blk addr is 0 which means there is no next blk.
-        if (next_blk_addr == 0)
+        if (next_blk_addr == 0) {
+            freeBlockInBuffer(blk, buffer);
             break;
+        }
 
         freeBlockInBuffer(blk, buffer);
-
         if ((blk = readBlockFromDisk(next_blk_addr, buffer)) == NULL) {
             perror("Reading Block Failed!\n");
             return -1;
         }
     }
     return 0;
+}
+
+void freshBlockInBuffer(Buffer *buffer, unsigned char *blk) {
+    for (int i = 0; i < buffer->blkSize; i += int_size)
+        memcpy(blk + i, (unsigned char *) &end_blk_next_addr, int_size);
 }

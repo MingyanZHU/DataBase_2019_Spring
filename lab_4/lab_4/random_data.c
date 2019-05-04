@@ -10,7 +10,7 @@
 R *randomGenerateRelationR() {
     R *r = (R *) malloc(NUMBER_OF_R * sizeof(R));
     int i;
-    srand(time(NULL));
+    srand(RANDOM_SEED);
     for (i = 0; i < NUMBER_OF_R; i++) {
         int a = rand() % (A_MAX + 1 - A_MIN) + A_MIN;
         int b = rand() % (B_MAX + 1 - B_MIN) + B_MIN;
@@ -25,7 +25,7 @@ R *randomGenerateRelationR() {
 S *randomGenerateRelationS() {
     S *s = (S *) malloc(NUMBER_OF_S * sizeof(S));
     int i;
-    srand(time(NULL));
+    srand(RANDOM_SEED);
     for (i = 0; i < NUMBER_OF_S; i++) {
         int c = rand() % (C_MAX + 1 - C_MIN) + C_MIN;
         int d = rand() % (D_MAX + 1 - D_MIN) + D_MIN;
