@@ -32,6 +32,14 @@ int outputDataFromDisk(Buffer *buffer, unsigned int addr);
 // Fresh block in buffer, make them to 0.
 void freshBlockInBuffer(Buffer *buffer, unsigned char *blk);
 
+// Relation R External sorting, make sure all blocks in buffer is free.
+int rExternalSorting(Buffer *buffer, int paramIndex);
+
+int compareR_1(const void *a, const void *b) {
+    return ((*(R *) a).a - (*(R *) b).a);
+}
+
+
 int main() {
     Buffer buffer;
     unsigned char *blk;
@@ -74,6 +82,13 @@ int main() {
     }
     printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
+    printf("======================================\n");
+    outputDataFromDisk(&buffer, r_start_addr);
+    rExternalSorting(&buffer, 1);
+    printf("======================================\n");
+    outputDataFromDisk(&buffer, r_start_addr);
+
+//    freeBuffer(&buffer);
     return 0;
 }
 
@@ -226,4 +241,63 @@ int outputDataFromDisk(Buffer *buffer, unsigned int addr) {
 void freshBlockInBuffer(Buffer *buffer, unsigned char *blk) {
     for (int i = 0; i < buffer->blkSize; i += int_size)
         memcpy(blk + i, (unsigned char *) &end_blk_next_addr, int_size);
+}
+
+int rExternalSorting(Buffer *buffer, int paramIndex) {
+    if (paramIndex != 1 && paramIndex != 2) {
+        perror("Param used to sorting must be 1 or 2.\n");
+        return -1;
+    }
+    int blk_num = buffer->bufSize / buffer->blkSize;
+    int countBlk = 0;
+    unsigned int addr = r_start_addr;
+    unsigned char *blks[blk_num];
+    while (countBlk < blk_num) {
+        blks[countBlk] = readBlockFromDisk(addr, buffer);
+        memcpy(&addr, (int *) (blks[countBlk] + buffer->blkSize - tuples_size), int_size);
+        countBlk++;
+    }
+    for (int i = 0; i < blk_num; i++) {
+        for (int j = 0; j < tuples_per_block; j++) {
+            unsigned char *ip_1 = blks[i] + j * tuples_size;
+            unsigned char *ip_2 = blks[i] + j * tuples_size + int_size;
+            // 以上loop 1
+            int x;
+            memcpy(&x, (int *) (ip_1 + (paramIndex - 1) * int_size), int_size);
+            for (int ii = i; ii < blk_num; ii++) {
+                int jj = ii == i ? j : 0;
+                for (; jj < tuples_per_block; jj++) {
+                    // loop 2
+                    int y;
+                    memcpy(&y, (int *) (blks[ii] + jj * tuples_size + (paramIndex - 1) * int_size), int_size);
+                    if (x > y) {
+                        ip_1 = blks[ii] + jj * tuples_size;
+                        ip_2 = blks[ii] + jj * tuples_size + int_size;
+                        x = y;
+                    }
+                }
+            }
+            if ((blks[i] + j * tuples_size) != ip_1) {
+                int a, b;
+                memcpy(&a, (int *) ip_1, int_size);
+                memcpy(&b, (int *) ip_2, int_size);
+                memcpy(ip_1, (unsigned char *) (blks[i] + j * tuples_size), int_size);
+                memcpy(ip_2, (unsigned char *) (blks[i] + j * tuples_size + int_size), int_size);
+                memcpy(blks[i] + j * tuples_size, (unsigned char *) &a, int_size);
+                memcpy(blks[i] + j * tuples_size + int_size, (unsigned char *) &b, int_size);
+            }
+        }
+    }
+
+    addr = r_start_addr;
+    for (int i = 0; i < blk_num; i++) {
+        unsigned int next_addr;
+        memcpy(&next_addr, (unsigned int *) (blks[i] + buffer->blkSize - tuples_size), int_size);
+        if (writeBlockToDisk(blks[i], addr, buffer) != 0) {
+            perror("Writing Block Failed!\n");
+            return -1;
+        }
+        addr = next_addr;
+    }
+    return 0;
 }
