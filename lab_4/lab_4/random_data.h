@@ -13,7 +13,7 @@
 #define NUMBER_OF_R 112
 #define NUMBER_OF_S 224
 
-#define RANDOM_SEED 1
+#define RANDOM_SEED 3
 
 typedef struct relationR {
     int a, b;
