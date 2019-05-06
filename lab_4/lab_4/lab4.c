@@ -17,6 +17,7 @@ const unsigned int sort_addr_bias = 30000;
 const unsigned int ext_sort_s_answer_addr = 40000;
 const unsigned int ext_sort_r_answer_addr = 50000;
 const unsigned int projection_addr = 60000;
+const unsigned int join_answer_addr = 70000;
 const size_t bufSize = 520;
 const size_t blkSize = 64;
 const unsigned int tuples_per_block = 7;
@@ -50,6 +51,12 @@ int outputProjection(Buffer *buffer);
 // binary search
 int binarySearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int searchValue);
 
+// nest loop join
+int nestLoopJoin(Buffer *buffer);
+
+// sort merge join
+int sortMergeJoin(Buffer *buffer);
+
 int main() {
     Buffer buffer;
     unsigned char *blk;
@@ -80,35 +87,42 @@ int main() {
     printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
 
-    externalSorting(&buffer, r_start_addr, 1);
-    printf("After external sorting:\n");
-    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-    outputNormalRelationFromDisk(&buffer, r_start_addr + sort_addr_bias);
-    printf("======================================\n");
-    printf("After output data from disk:\n");
-    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-
-    int search_ans = binarySearch(&buffer, r_start_addr, 1, 40);
-    printf("After binary search in relation:\n");
-    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-    if (search_ans != 0) {
-        if (search_ans < 0) {
-            perror("Linear Search Failed\n");
-            return -1;
-        } else {
-            printf("Not found!\n");
-        }
-    } else {
-        if (outputNormalRelationFromDisk(&buffer, linear_search_answer_addr) != 0) {
-            perror("Output Data From Disk Filed\n");
-            return -1;
-        }
-        printf("After output linear search result to disk:\n");
-        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-    }
-
+//    externalSorting(&buffer, r_start_addr, 1);
+//    printf("After external sorting:\n");
+//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+//    outputNormalRelationFromDisk(&buffer, r_start_addr);
 //    printf("======================================\n");
+//    printf("After output data from disk:\n");
+//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+//
+//    int search_ans = binarySearch(&buffer, r_start_addr, 1, 40);
+//    printf("After binary search in relation:\n");
+//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+//    if (search_ans != 0) {
+//        if (search_ans < 0) {
+//            perror("Linear Search Failed\n");
+//            return -1;
+//        } else {
+//            printf("Not found!\n");
+//        }
+//    } else {
+//        if (outputNormalRelationFromDisk(&buffer, linear_search_answer_addr) != 0) {
+//            perror("Output Data From Disk Filed\n");
+//            return -1;
+//        }
+//        printf("After output linear search result to disk:\n");
+//        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+//    }
+//
+//    printf("======================================\n");
+//    externalSorting(&buffer, s_start_addr, 1);
 //    outputNormalRelationFromDisk(&buffer, s_start_addr);
+//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+    printf("======================================\n");
+    sortMergeJoin(&buffer);
+    printf("After nest loop join:\n");
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+
 //    printf("After output relation from disk:\n");
 //    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 //
@@ -121,7 +135,7 @@ int main() {
 //    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 //
 //    printf("======================================\n");
-//    outputNormalRelationFromDisk(&buffer, s_start_addr + sort_addr_bias);
+//    outputNormalRelationFromDisk(&buffer, r_start_addr + sort_addr_bias);
 //    printf("After output relation from disk:\n");
 //    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 //
@@ -740,4 +754,251 @@ int binarySearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int
             return -1;
     }
     return 0;
+}
+
+int nestLoopJoin(Buffer *buffer) {
+    unsigned int out_addr, in_addr;
+    if (NUMBER_OF_S > NUMBER_OF_R) {
+        out_addr = r_start_addr;
+        in_addr = s_start_addr;
+    } else {
+        out_addr = s_start_addr;
+        in_addr = r_start_addr;
+    }
+    int found = 0;
+    unsigned char *out_p, *in_p, *write_buffer;
+    unsigned int write_next_addr = join_answer_addr;
+    unsigned int origin_in_relation_start_addr = in_addr;
+    int write_using = 0;
+    write_buffer = getNewBlockInBuffer(buffer);
+    freshBlockInBuffer(buffer, write_buffer);
+    while (1) {
+        if ((out_p = readBlockFromDisk(out_addr, buffer)) == NULL) {
+            perror("Reading Block Failed!\n");
+            return -1;
+        }
+        for (int i = 0; i < tuples_per_block; i++) {
+            int x1, y1;
+            memcpy(&x1, (int *) (out_p + i * tuples_size), int_size);
+            memcpy(&y1, (int *) (out_p + i * tuples_size + int_size), int_size);
+            in_addr = origin_in_relation_start_addr;
+            while (1) {
+                if ((in_p = readBlockFromDisk(in_addr, buffer)) == NULL) {
+                    perror("Reading Block Failed!\n");
+                    return -1;
+                }
+                for (int j = 0; j < tuples_per_block; j++) {
+                    int x2, y2;
+                    memcpy(&x2, (int *) (in_p + j * tuples_size), int_size);
+                    memcpy(&y2, (int *) (in_p + j * tuples_size + int_size), int_size);
+
+                    if (x1 == x2) {
+                        found = 1;
+                        memcpy(write_buffer + write_using, (unsigned char *) &x1, int_size);
+                        memcpy(write_buffer + write_using + int_size, (unsigned char *) &y1, int_size);
+                        memcpy(write_buffer + write_using + tuples_size, (unsigned char *) &y2, int_size);
+                        write_using += (tuples_size + int_size);
+                        if (write_using + tuples_size + int_size >= blkSize) {
+                            int temp_write_next_addr = write_next_addr + blkSize;
+                            memcpy(write_buffer + write_using, (unsigned char *) &temp_write_next_addr, int_size);
+                            if (writeBlockToDisk(write_buffer, write_next_addr, buffer) != 0)
+                                return -1;
+                            write_buffer = getNewBlockInBuffer(buffer);
+                            freshBlockInBuffer(buffer, write_buffer);
+                            write_using = 0;
+                            write_next_addr = temp_write_next_addr;
+                        }
+                    }
+                }
+                unsigned int temp_in_next_addr;
+                memcpy(&temp_in_next_addr, (unsigned int *) (in_p + blkSize - tuples_size), int_size);
+                freeBlockInBuffer(in_p, buffer);
+                if (temp_in_next_addr == 0)
+                    break;
+
+                in_addr = temp_in_next_addr;
+            }
+        }
+        unsigned int temp_out_next_addr;
+        memcpy(&temp_out_next_addr, (unsigned int *) (out_p + blkSize - tuples_size), int_size);
+        freeBlockInBuffer(out_p, buffer);
+        if (temp_out_next_addr == 0)
+            break;
+
+        out_addr = temp_out_next_addr;
+    }
+    if (write_using == 0) {
+        if (found == 0) {
+            freeBlockInBuffer(write_buffer, buffer);
+            return 1;   // not such tuples
+        } else {
+            freeBlockInBuffer(write_buffer, buffer);
+            if ((write_buffer = readBlockFromDisk(write_next_addr - blkSize, buffer)) == NULL) {
+                perror("Reading Block Failed!\n");
+                return -1;
+            }
+            memcpy(write_buffer + blkSize - int_size, (unsigned char *) &end_blk_next_addr, int_size);
+            if (writeBlockToDisk(write_buffer, write_next_addr - blkSize, buffer) != 0)
+                return -1;
+            return 0;
+        }
+    } else {
+        if (writeBlockToDisk(write_buffer, write_next_addr, buffer) != 0)
+            return -1;
+        return 0;
+    }
+}
+
+int sortMergeJoin(Buffer *buffer) {
+    externalSorting(buffer, s_start_addr, 1);
+    externalSorting(buffer, r_start_addr, 1);
+    printf("Before sort-merge join, after sort relation r and s\n:");
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer->numFreeBlk, buffer->numAllBlk, buffer->numIO);
+
+    unsigned char *r_read_buffer, *s_read_buffer, *write_buffer;
+    int write_using = 0;
+    unsigned int write_next_addr = join_answer_addr;
+    write_buffer = getNewBlockInBuffer(buffer);
+    freshBlockInBuffer(buffer, write_buffer);
+    int ri, si, found;
+    ri = si = found = 0;
+    unsigned int s_next_addr, r_next_addr;
+    s_next_addr = s_start_addr + sort_addr_bias;
+    r_next_addr = r_start_addr + sort_addr_bias;
+
+    if ((r_read_buffer = readBlockFromDisk(r_next_addr, buffer)) == NULL) {
+        perror("Reading Block Failed!\n");
+        return -1;
+    }
+
+    if ((s_read_buffer = readBlockFromDisk(s_next_addr, buffer)) == NULL) {
+        perror("Reading Block Failed!\n");
+        return -1;
+    }
+    S s[32];    // 除去3个已用的缓存块 最多可存储数据所用空间可以存储40个关系S的元组 超过32个重复元素的sort-merge join不正确
+    int s_array_count = 0;
+    while (1) {
+        if (ri >= tuples_per_block) {
+            unsigned int temp_r_read_next_addr;
+            memcpy(&temp_r_read_next_addr, (unsigned int *) (r_read_buffer + ri * tuples_size), int_size);
+            freeBlockInBuffer(r_read_buffer, buffer);
+            if (temp_r_read_next_addr == 0) {
+                freeBlockInBuffer(s_read_buffer, buffer);
+                break;
+            }
+            r_next_addr = temp_r_read_next_addr;
+            if ((r_read_buffer = readBlockFromDisk(r_next_addr, buffer)) == NULL) {
+                perror("Reading Block Failed!\n");
+                return -1;
+            }
+            ri = 0;
+        }
+        if (si >= tuples_per_block) {
+            unsigned int temp_s_read_next_addr;
+            memcpy(&temp_s_read_next_addr, (unsigned int *) (s_read_buffer + si * tuples_size), int_size);
+            freeBlockInBuffer(s_read_buffer, buffer);
+            if (temp_s_read_next_addr == 0) {
+                freeBlockInBuffer(r_read_buffer, buffer);
+                break;
+            }
+            s_next_addr = temp_s_read_next_addr;
+            if ((s_read_buffer = readBlockFromDisk(s_next_addr, buffer)) == NULL) {
+                perror("Reading Block Failed!\n");
+                return -1;
+            }
+            si = 0;
+        }
+        int x1, y1, x2, y2;
+        memcpy(&x1, (int *) (r_read_buffer + ri * tuples_size), int_size);
+        memcpy(&y1, (int *) (r_read_buffer + ri * tuples_size + int_size), int_size);
+        memcpy(&x2, (int *) (s_read_buffer + si * tuples_size), int_size);
+        memcpy(&y2, (int *) (s_read_buffer + si * tuples_size + int_size), int_size);
+
+        if (x1 == x2) {
+            found = 1;
+            if (s_array_count == 0) {
+                s[s_array_count].c = x2;
+                s[s_array_count++].d = y2;
+                unsigned char *temp_s_read_buffer;
+                // 尝试向下找所有与x2相等的元组
+                if ((temp_s_read_buffer = readBlockFromDisk(s_next_addr, buffer)) == NULL) {
+                    perror("Reading Block Failed!\n");
+                    return -1;
+                }
+                int temp_si = si + 1;
+                while (1) {
+                    if (temp_si >= tuples_per_block) {
+                        unsigned int temp_temp_s_read_next_addr;
+                        memcpy(&temp_temp_s_read_next_addr,
+                               (unsigned int *) (temp_s_read_buffer + temp_si * tuples_size), int_size);
+                        freeBlockInBuffer(temp_s_read_buffer, buffer);
+                        if (temp_temp_s_read_next_addr == 0)
+                            break;
+                        if ((temp_s_read_buffer = readBlockFromDisk(temp_temp_s_read_next_addr, buffer)) == NULL) {
+                            perror("Reading Block Failed!\n");
+                            return -1;
+                        }
+                        temp_si = 0;
+                    }
+                    int c, d;
+                    memcpy(&c, (int *) (temp_s_read_buffer + temp_si * tuples_size), int_size);
+                    memcpy(&d, (int *) (temp_s_read_buffer + temp_si * tuples_size + int_size), int_size);
+                    if (c == x2) {
+                        s[s_array_count].c = c;
+                        s[s_array_count++].d = d;
+                        temp_si++;
+                    } else {
+                        freeBlockInBuffer(temp_s_read_buffer, buffer);
+                        break;
+                    }
+                }
+            }
+            for (int i = 0; i < s_array_count; i++) {
+                memcpy(write_buffer + write_using, (unsigned char *) &x2, int_size);
+                memcpy(write_buffer + write_using + int_size, (unsigned char *) &y1, int_size);
+                memcpy(write_buffer + write_using + int_size * 2, (unsigned char *) &(s[i].d), int_size);
+                write_using += (tuples_size + int_size);
+                if (write_using + tuples_size + int_size >= blkSize) {
+                    int temp_write_next_addr = write_next_addr + blkSize;
+                    memcpy(write_buffer + write_using, (unsigned char *) &temp_write_next_addr, int_size);
+                    if (writeBlockToDisk(write_buffer, write_next_addr, buffer) != 0)
+                        return -1;
+                    write_next_addr = temp_write_next_addr;
+                    write_using = 0;
+                    write_buffer = getNewBlockInBuffer(buffer);
+                    freshBlockInBuffer(buffer, write_buffer);
+                }
+            }
+            ri++;
+        } else {
+            s_array_count = 0;
+            if (x1 < x2) {
+                ri++;
+            } else if (x1 > x2) {
+                si++;
+            }
+        }
+    }
+    if (write_using == 0) {
+        freeBlockInBuffer(write_buffer, buffer);
+        if (found == 0) {
+            // not found
+            return 1;
+        } else {
+            if ((write_buffer = readBlockFromDisk(write_next_addr - blkSize, buffer)) == NULL) {
+                perror("Reading Block Failed!\n");
+                return -1;
+            }
+            // 此处式子不具有一般性 应改为 write_buffer + blkSize - blkSize / (int_size + tuple_size) * (int_size + tuple_size)
+            // 为了方便写为下列形式
+            memcpy(write_buffer + blkSize - int_size, (unsigned char *) &end_blk_next_addr, int_size);
+            if (writeBlockToDisk(write_buffer, write_next_addr - blkSize, buffer) != 0)
+                return -1;
+            return 0;
+        }
+    } else {
+        if (writeBlockToDisk(write_buffer, write_next_addr, buffer) != 0)
+            return -1;
+        return 0;
+    }
 }
