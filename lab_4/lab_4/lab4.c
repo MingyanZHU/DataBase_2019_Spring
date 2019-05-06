@@ -18,6 +18,7 @@ const unsigned int ext_sort_s_answer_addr = 40000;
 const unsigned int ext_sort_r_answer_addr = 50000;
 const unsigned int projection_addr = 60000;
 const unsigned int join_answer_addr = 70000;
+const unsigned int b_plus_tree_root_addr = 80000;
 const size_t bufSize = 520;
 const size_t blkSize = 64;
 const unsigned int tuples_per_block = 7;
@@ -56,6 +57,8 @@ int nestLoopJoin(Buffer *buffer);
 
 // sort merge join
 int sortMergeJoin(Buffer *buffer);
+
+int addBPlusTree(Buffer *buffer, unsigned int relation_addr, int paramIndex);
 
 int main() {
     Buffer buffer;
@@ -123,6 +126,8 @@ int main() {
     printf("After nest loop join:\n");
     printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
+    addBPlusTree(&buffer, r_start_addr, 1);
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 //    printf("After output relation from disk:\n");
 //    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 //
@@ -852,7 +857,7 @@ int nestLoopJoin(Buffer *buffer) {
 int sortMergeJoin(Buffer *buffer) {
     externalSorting(buffer, s_start_addr, 1);
     externalSorting(buffer, r_start_addr, 1);
-    printf("Before sort-merge join, after sort relation r and s\n:");
+    printf("Before sort-merge join, after sort relation r and s:\n");
     printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer->numFreeBlk, buffer->numAllBlk, buffer->numIO);
 
     unsigned char *r_read_buffer, *s_read_buffer, *write_buffer;
@@ -1001,4 +1006,131 @@ int sortMergeJoin(Buffer *buffer) {
             return -1;
         return 0;
     }
+}
+
+int addBPlusTree(Buffer *buffer, unsigned int relation_addr, int paramIndex) {
+    if (relation_addr != r_start_addr && relation_addr != s_start_addr) {
+        perror("There are only two relations: R and S!\n");
+        return -1;
+    }
+
+    if (paramIndex != 1 && paramIndex != 2) {
+        perror("Param index of binary search is 1 or 2!\n");
+        return -1;
+    }
+
+    externalSorting(buffer, relation_addr, paramIndex);
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer->numFreeBlk, buffer->numAllBlk, buffer->numIO);
+
+    unsigned char *read_buffer, *write_leaf_buffer, *write_inner_buffer;
+    int write_leaf_buffer_using = 0;
+    unsigned int write_next_addr = b_plus_tree_root_addr + blkSize;
+    write_leaf_buffer = getNewBlockInBuffer(buffer);
+    freshBlockInBuffer(buffer, write_leaf_buffer);
+
+    unsigned int read_next_addr = relation_addr + sort_addr_bias;
+    int inner_index = 0;
+    write_inner_buffer = getNewBlockInBuffer(buffer);
+
+    unsigned char *root_buffer = NULL;
+    int root_using = 0;
+
+    freshBlockInBuffer(buffer, write_inner_buffer);
+
+    int now_value = -1;
+    while (1) {
+        if ((read_buffer = readBlockFromDisk(read_next_addr, buffer)) == NULL) {
+            perror("Reading Block Failed!\n");
+            return -1;
+        }
+        for (int i = 0; i < tuples_per_block; i++) {
+            int x, y;
+            memcpy(&x, (int *) (read_buffer + i * tuples_size), int_size);
+            memcpy(&y, (int *) (read_buffer + i * tuples_size + int_size), int_size);
+            if (now_value == -1) {
+                now_value = paramIndex == 1 ? x : y;
+                memcpy(write_leaf_buffer + write_leaf_buffer_using, (unsigned char *) &read_next_addr, int_size);
+                write_leaf_buffer_using += int_size;
+                // 第一次进入
+            } else {
+                if ((paramIndex == 1 && x > now_value) || (paramIndex == 2 && y > now_value)) {
+                    now_value = paramIndex == 1 ? x : y;
+                    memcpy(write_leaf_buffer + write_leaf_buffer_using, (unsigned char *) &read_next_addr, int_size);
+                    write_leaf_buffer_using += int_size;
+                    if (write_leaf_buffer_using / int_size >= tuples_per_block) {
+                        // m = 6
+                        if (writeBlockToDisk(write_leaf_buffer, write_next_addr, buffer) != 0)
+                            return -1;
+                        memcpy(write_inner_buffer + 2 * inner_index * int_size, (unsigned char *) &write_next_addr,
+                               int_size);
+                        now_value++;
+                        memcpy(write_inner_buffer + (2 * inner_index + 1) * int_size, (unsigned char *) &now_value,
+                               int_size);
+
+                        write_next_addr += blkSize;
+                        write_leaf_buffer = getNewBlockInBuffer(buffer);
+                        freshBlockInBuffer(buffer, write_leaf_buffer);
+                        write_leaf_buffer_using = 0;
+
+                        inner_index++;
+                        if (inner_index >= tuples_per_block) {
+                            // 内节点已满
+                            if (root_buffer == NULL) {
+                                root_buffer = getNewBlockInBuffer(buffer);
+                                freshBlockInBuffer(buffer, root_buffer);
+                                root_using = 0;
+                            }
+                            if (writeBlockToDisk(write_inner_buffer, write_next_addr, buffer) != 0)
+                                return -1;
+                            memcpy(root_buffer + 2 * root_using * int_size, (unsigned char *) &write_next_addr,
+                                   int_size);
+                            memcpy(root_buffer + (2 * root_using + 1) * int_size, (unsigned char *) &now_value,
+                                   int_size);
+                            root_using++;
+                            write_next_addr += blkSize;
+                            write_inner_buffer = getNewBlockInBuffer(buffer);
+                            freshBlockInBuffer(buffer, write_inner_buffer);
+                            inner_index = 0;
+                        }
+                        now_value--;
+                    }
+                }
+            }
+        }
+        unsigned int temp_next_read_addr;
+        memcpy(&temp_next_read_addr, (unsigned int *) (read_buffer + blkSize - tuples_size), int_size);
+        freeBlockInBuffer(read_buffer, buffer);
+        if (temp_next_read_addr == 0)
+            break;
+        read_next_addr = temp_next_read_addr;
+    }
+    if (root_buffer == NULL) {
+        if (write_leaf_buffer_using != 0) {
+            memcpy(write_inner_buffer + 2 * inner_index * int_size, (unsigned char *) &write_next_addr, int_size);
+            if (writeBlockToDisk(write_leaf_buffer, write_next_addr, buffer) != 0)
+                return -1;
+//        write_next_addr += blkSize;
+        } else {
+            freeBlockInBuffer(write_leaf_buffer, buffer);
+        }
+        if (writeBlockToDisk(write_inner_buffer, b_plus_tree_root_addr, buffer) != 0)
+            return -1;
+    } else {
+        if (write_leaf_buffer_using != 0) {
+            unsigned int temp_write_next_addr = write_next_addr - blkSize;  // 此时write_next_addr代表的是当前内部块的地址
+            // todo 此处应该区分write_next_addr的使用 可以重构为对于write_leaf_buffer和write_inner_buffer使用不同的变量区分地址
+            memcpy(write_inner_buffer + 2 * inner_index * int_size, (unsigned char *) &temp_write_next_addr, int_size);
+            if (writeBlockToDisk(write_leaf_buffer, write_next_addr, buffer) != 0)
+                return -1;
+        } else {
+            freeBlockInBuffer(write_leaf_buffer, buffer);
+        }
+        if (inner_index != 0)
+            memcpy(root_buffer + 2 * root_using * int_size, (unsigned char *) &write_next_addr, int_size);
+        if (writeBlockToDisk(root_buffer, b_plus_tree_root_addr, buffer) != 0)
+            return -1;
+        if (writeBlockToDisk(write_inner_buffer, write_next_addr, buffer) != 0)
+            return -1;
+    }
+    return 0;
 }
