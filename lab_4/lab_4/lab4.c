@@ -22,58 +22,71 @@ const unsigned int join_answer_addr = 70000;
 const unsigned int b_plus_tree_root_addr = 80000;
 const unsigned int hash_s_addr = 1000000;
 const unsigned int hash_r_addr = 2000000;
-const int mod = 10000;
+const int mod = 20;
 const size_t bufSize = 520;
 const size_t blkSize = 64;
 const unsigned int tuples_per_block = 7;
 const unsigned int tuples_size = 8;
 const unsigned int int_size = 4;
 
+/* 工具函数 */
 // load Relation R to Disk without any index.
 int loadRelationRToDisk(Buffer *buffer, unsigned char *blk);
 
 // load Relation S to Disk without any index.
 int loadRelationSToDisk(Buffer *buffer, unsigned char *blk);
 
-// linear Search on Relation
-int linearSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int searchValue);
-
 // output normal relation
-int outputNormalRelationFromDisk(Buffer *buffer, unsigned int addr);
-
-// Fresh block in buffer, make them to 0.
-void freshBlockInBuffer(Buffer *buffer, unsigned char *blk);
-
-// Relation External sorting, make sure all blocks in buffer is free.
-int externalSorting(Buffer *buffer, unsigned int start_addr, int paramIndex);
-
-// project the first value of relation
-int projection(Buffer *buffer, unsigned int start_addr);
+int outputNormalRelation(Buffer *buffer, unsigned int addr);
 
 // output projection answer
 int outputProjection(Buffer *buffer);
 
+// output join answer
+int outputJoinAnswer(Buffer *buffer);
+
+// add balanced plus tree index to data
+int addBPlusTree(Buffer *buffer, unsigned int relation_addr, int paramIndex);
+
+// Fresh block in buffer, make them to 0.
+void freshBlockInBuffer(Buffer *buffer, unsigned char *blk);
+
+// init hash bucket
+int freshHashBucket(Buffer *buffer, unsigned int relation_addr);
+
+// hash function
+int hash(int x) {
+    return x * 2654435761 % mod;
+}
+
+// transform a relation to hash bucket
+int hashRelation(Buffer *buffer, unsigned int relation_addr, int paramIndex);
+
+// Relation External sorting, make sure all blocks in buffer is free.
+int externalSorting(Buffer *buffer, unsigned int start_addr, int paramIndex);
+
+/* 搜索 */
+// linear Search on Relation
+int linearSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int searchValue);
+
 // binary search
 int binarySearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int searchValue);
 
+// search on balanced plus tree
+int bPlusTreeSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int searchValue);
+
+/* 投影 */
+// project the first value of relation
+int projection(Buffer *buffer, unsigned int start_addr);
+
+/* 连接 */
 // nest loop join
 int nestLoopJoin(Buffer *buffer);
 
 // sort merge join
 int sortMergeJoin(Buffer *buffer);
 
-int addBPlusTree(Buffer *buffer, unsigned int relation_addr, int paramIndex);
-
-int bPlusTreeSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int searchValue);
-
-int hash(int x) {
-    return x * 2654435761 % mod;
-}
-
-int freshHashAddr(Buffer *buffer, unsigned int relation_addr);
-
-int hashRelation(Buffer *buffer, unsigned int relation_addr, int paramIndex);
-
+// hash join
 int hashJoin(Buffer *buffer);
 
 int main() {
@@ -105,77 +118,72 @@ int main() {
     printf("After load relation R to Disk:\n");
     printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
 
-    externalSorting(&buffer, s_start_addr, 1);
-    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//    externalSorting(&buffer, r_start_addr, 1);
-//    printf("After external sorting:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//    outputNormalRelationFromDisk(&buffer, r_start_addr);
-//    printf("======================================\n");
-//    printf("After output data from disk:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    int search_ans = binarySearch(&buffer, r_start_addr, 1, 40);
-//    printf("After binary search in relation:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//    if (search_ans != 0) {
-//        if (search_ans < 0) {
-//            perror("Linear Search Failed\n");
-//            return -1;
-//        } else {
-//            printf("Not found!\n");
-//        }
-//    } else {
-//        if (outputNormalRelationFromDisk(&buffer, search_answer_addr) != 0) {
-//            perror("Output Data From Disk Filed\n");
-//            return -1;
-//        }
-//        printf("After output linear search result to disk:\n");
-//        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//    }
-//
-//    printf("======================================\n");
-//    externalSorting(&buffer, s_start_addr, 1);
-//    outputNormalRelationFromDisk(&buffer, s_start_addr);
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//    printf("======================================\n");
-//    sortMergeJoin(&buffer);
-//    printf("After nest loop join:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    bPlusTreeSearch(&buffer, r_start_addr, 2, 840);
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//    printf("After output relation from disk:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    externalSorting(&buffer, s_start_addr, 1);
-//    printf("After external sorting:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    outputNormalRelationFromDisk(&buffer, s_start_addr);
-//    printf("After output relation from disk:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    printf("======================================\n");
-//    outputNormalRelationFromDisk(&buffer, r_start_addr + sort_addr_bias);
-//    printf("After output relation from disk:\n");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    projection(&buffer, r_start_addr);
-//    printf("======================================\n");
-//    printf("After projection:");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-//
-//    outputProjection(&buffer);
-//    printf("======================================\n");
-//    printf("After output projection answer:");
-//    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
-
+    /* 搜索 */
     printf("======================================\n");
-    hashRelation(&buffer, s_start_addr, 1);
-    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+//    int search_ans = linearSearch(&buffer, r_start_addr, 1, 40);
+//    int search_ans = binarySearch(&buffer, r_start_addr, 1, 40);
+    int search_ans = bPlusTreeSearch(&buffer, r_start_addr, 1, 40);
+    if (search_ans != 0) {
+        if (search_ans < 0) {
+            perror("Linear Search Failed\n");
+            return -1;
+        } else {
+            printf("Not found!\n");
+        }
+    } else {
+        printf("After search in relation:\n");
+        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+        printf("Output search answer:\n");
+        if (outputNormalRelation(&buffer, search_answer_addr) != 0) {
+            perror("Output Data From Disk Filed\n");
+            return -1;
+        }
+        printf("After output search answer:\n");
+        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+    }
 
-//    freeBuffer(&buffer);
+    /* 投影 */
+    printf("======================================\n");
+    int projection_ans = projection(&buffer, r_start_addr);
+    if (projection_ans != 0) {
+        perror("Project Failed!\n");
+        return -1;
+    } else {
+        printf("After projection on relation:\n");
+        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+        printf("Projection Answer:\n");
+        if (outputProjection(&buffer) != 0) {
+            perror("Output Projection Answer Failed!\n");
+            return -1;
+        }
+        printf("After output projection answer:\n");
+        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+    }
+
+    /* 连接 */
+    printf("======================================\n");
+//    int join_ans = nestLoopJoin(&buffer);
+//    int join_ans = sortMergeJoin(&buffer);
+    int join_ans = hashJoin(&buffer);
+    if (join_ans != 0) {
+        if (join_ans < 0) {
+            perror("Join Failed!\n");
+            return -1;
+        } else {
+            printf("Not Answer!\n");
+        }
+    } else {
+        printf("After join on relation:\n");
+        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+        printf("Join Answer:\n");
+        if (outputJoinAnswer(&buffer) != 0) {
+            perror("Output Join Answer Failed!\n");
+            return -1;
+        }
+        printf("After output join answer:\n");
+        printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer.numFreeBlk, buffer.numAllBlk, buffer.numIO);
+    }
+
     return 0;
 }
 
@@ -329,37 +337,28 @@ int linearSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, int
     return not_found;
 }
 
-int outputNormalRelationFromDisk(Buffer *buffer, unsigned int addr) {
-    unsigned char *blk;
-    if ((blk = readBlockFromDisk(addr, buffer)) == NULL) {
-        perror("Reading Block Failed!\n");
-        return -1;
-    }
-
+int outputNormalRelation(Buffer *buffer, unsigned int addr) {
+    unsigned char *read_buffer;
+    unsigned int read_addr = addr;
     while (1) {
-        unsigned char *temp = blk;
-        for (int i = 0; i < tuples_per_block; i++) {
-            int c, d;
-            memcpy(&c, (int *) temp, int_size);
-            memcpy(&d, (int *) (temp + int_size), int_size);
-            printf("%d %d\n", c, d);
-            temp += tuples_size;
-        }
-        unsigned int next_blk_addr;
-        memcpy(&next_blk_addr, (unsigned int *) temp, int_size);
-        printf("%d\n", next_blk_addr);
-
-        // next blk addr is 0 which means there is no next blk.
-        if (next_blk_addr == 0) {
-            freeBlockInBuffer(blk, buffer);
-            break;
-        }
-
-        freeBlockInBuffer(blk, buffer);
-        if ((blk = readBlockFromDisk(next_blk_addr, buffer)) == NULL) {
+        printf("blk: %d\n", read_addr);
+        if ((read_buffer = readBlockFromDisk(read_addr, buffer)) == NULL) {
             perror("Reading Block Failed!\n");
             return -1;
         }
+        for (int i = 0; i < tuples_per_block; i++) {
+            int x, y;
+            memcpy(&x, (int *) (read_buffer + i * tuples_size), int_size);
+            memcpy(&y, (int *) (read_buffer + i * tuples_size + int_size), int_size);
+            printf("%d %d\n", x, y);
+        }
+        unsigned int next_read_addr;
+        memcpy(&next_read_addr, (unsigned int *) (read_buffer + blkSize - tuples_size), int_size);
+        freeBlockInBuffer(read_buffer, buffer);
+        if (next_read_addr == 0)
+            break;
+
+        read_addr = next_read_addr;
     }
     return 0;
 }
@@ -593,33 +592,23 @@ int projection(Buffer *buffer, unsigned int start_addr) {
 int outputProjection(Buffer *buffer) {
     unsigned char *readBuffer;
     unsigned int addr = projection_addr;
-    if ((readBuffer = readBlockFromDisk(addr, buffer)) == NULL) {
-        perror("Reading Block Failed!\n");
-        return -1;
-    }
     while (1) {
-        unsigned char *temp = readBuffer;
-        for (int i = 0; i < blkSize - int_size; i += int_size) {
-            int x;
-            memcpy(&x, (int *) temp, int_size);
-            printf("%d\n", x);
-            temp += int_size;
-        }
-
-        unsigned int next_read_addr;
-        memcpy(&next_read_addr, (unsigned int *) temp, int_size);
-        printf("%d\n", next_read_addr);
-
-        if (next_read_addr == 0) {
-            freeBlockInBuffer(readBuffer, buffer);
-            break;
-        }
-
-        freeBlockInBuffer(readBuffer, buffer);
-        if ((readBuffer = readBlockFromDisk(next_read_addr, buffer)) == NULL) {
+        printf("blk: %d\n", addr);
+        if ((readBuffer = readBlockFromDisk(addr, buffer)) == NULL) {
             perror("Reading Block Failed!\n");
             return -1;
         }
+        for (int i = 0; i < blkSize - int_size; i += int_size) {
+            int x;
+            memcpy(&x, (int *) (readBuffer + i), int_size);
+            printf("%d\n", x);
+        }
+        unsigned int next_addr;
+        memcpy(&next_addr, (unsigned int *) (readBuffer + blkSize - int_size), int_size);
+        freeBlockInBuffer(readBuffer, buffer);
+        if (next_addr == 0)
+            break;
+        addr = next_addr;
     }
     return 0;
 }
@@ -1040,7 +1029,6 @@ int addBPlusTree(Buffer *buffer, unsigned int relation_addr, int paramIndex) {
     }
 
     externalSorting(buffer, relation_addr, paramIndex);
-    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer->numFreeBlk, buffer->numAllBlk, buffer->numIO);
 
     unsigned char *read_buffer, *write_leaf_buffer, *write_inner_buffer;
     int write_leaf_buffer_using = 0;
@@ -1188,7 +1176,13 @@ int bPlusTreeSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, 
         }
     }
 
-    addBPlusTree(buffer, relation_addr, paramIndex);
+    if (addBPlusTree(buffer, relation_addr, paramIndex) != 0) {
+        perror("Add balanced plus tree index failed!\n");
+        return -1;
+    }
+    printf("After adding b+ tree in relation:\n");
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer->numFreeBlk, buffer->numAllBlk, buffer->numIO);
+
     unsigned char *read_buffer, *write_buffer;
     unsigned int read_addr = b_plus_tree_root_addr;
     unsigned int write_addr = search_answer_addr;
@@ -1297,7 +1291,7 @@ int bPlusTreeSearch(Buffer *buffer, unsigned int relation_addr, int paramIndex, 
     return 1;
 }
 
-int freshHashAddr(Buffer *buffer, unsigned int relation_addr) {
+int freshHashBucket(Buffer *buffer, unsigned int relation_addr) {
     if (relation_addr != r_start_addr && relation_addr != s_start_addr) {
         perror("There are only two relations: R and S!\n");
         return -1;
@@ -1313,7 +1307,6 @@ int freshHashAddr(Buffer *buffer, unsigned int relation_addr) {
     return 0;
 }
 
-
 int hashRelation(Buffer *buffer, unsigned int relation_addr, int paramIndex) {
     if (relation_addr != r_start_addr && relation_addr != s_start_addr) {
         perror("There are only two relations: R and S!\n");
@@ -1325,7 +1318,7 @@ int hashRelation(Buffer *buffer, unsigned int relation_addr, int paramIndex) {
         return -1;
     }
 
-    freshHashAddr(buffer, relation_addr);
+    freshHashBucket(buffer, relation_addr);
 
     unsigned char *read_buffer, *write_buffer;
     int extra_buffer_using = 0;
@@ -1386,6 +1379,133 @@ int hashRelation(Buffer *buffer, unsigned int relation_addr, int paramIndex) {
         }
         unsigned int temp_next_read_addr;
         memcpy(&temp_next_read_addr, (unsigned int *) (read_buffer + blkSize - tuples_size), int_size);
+        freeBlockInBuffer(read_buffer, buffer);
+        if (temp_next_read_addr == 0)
+            break;
+        read_addr = temp_next_read_addr;
+    }
+    return 0;
+}
+
+int hashJoin(Buffer *buffer) {
+    int paramIndex = 1;
+    if (hashRelation(buffer, r_start_addr, paramIndex) != 0) {
+        perror("Hash relation R failed!\n");
+        return -1;
+    }
+    if (hashRelation(buffer, s_start_addr, paramIndex) != 0) {
+        perror("Hash relation S failed!\n");
+        return -1;
+    }
+
+    printf("Before hash-join, after hash relation r and relation s:\n");
+    printf("Free_blocks: %zu, All_blocks: %zu, IO times: %lu\n", buffer->numFreeBlk, buffer->numAllBlk, buffer->numIO);
+
+    unsigned char *r_read_buffer, *s_read_buffer, *write_buffer;
+    unsigned int r_addr, s_addr;
+    unsigned int write_addr = join_answer_addr;
+    int write_buffer_using = 0;
+    write_buffer = getNewBlockInBuffer(buffer);
+    freshBlockInBuffer(buffer, write_buffer);
+    for (int ri = 0; ri < mod; ri++) {
+        r_addr = hash_r_addr + ri * blkSize;
+        while (1) {
+            if ((r_read_buffer = readBlockFromDisk(r_addr, buffer)) == NULL) {
+                perror("Reading Block Failed!\n");
+                return -1;
+            }
+            int r_used_blk;
+            memcpy(&r_used_blk, (int *) (r_read_buffer + blkSize - int_size), int_size);
+            for (int i = 0; i < r_used_blk; i++) {
+                int a, b;
+                memcpy(&a, (int *) (r_read_buffer + i * tuples_size), int_size);
+                memcpy(&b, (int *) (r_read_buffer + i * tuples_size + int_size), int_size);
+                s_addr = hash_s_addr;
+                if (paramIndex == 1)
+                    s_addr += hash(a) * blkSize;
+                else
+                    s_addr += hash(b) * blkSize;
+                while (1) {
+                    if ((s_read_buffer = readBlockFromDisk(s_addr, buffer)) == NULL) {
+                        perror("Reading Block Failed!\n");
+                        return -1;
+                    }
+                    int s_used_blk;
+                    memcpy(&s_used_blk, (int *) (s_read_buffer + blkSize - int_size), int_size);
+                    for (int j = 0; j < s_used_blk; j++) {
+                        int c, d;
+                        memcpy(&c, (int *) (s_read_buffer + j * tuples_size), int_size);
+                        memcpy(&d, (int *) (s_read_buffer + j * tuples_size + int_size), int_size);
+                        if ((paramIndex == 1 && c == a) || (paramIndex == 2 && b == d)) {
+                            memcpy(write_buffer + write_buffer_using, (unsigned char *) &a, int_size);
+                            memcpy(write_buffer + write_buffer_using + int_size, (unsigned char *) &b, int_size);
+                            memcpy(write_buffer + write_buffer_using + int_size * 2, (unsigned char *) &d, int_size);
+                            write_buffer_using += (tuples_size + int_size);
+                            if (write_buffer_using + tuples_size + int_size >= blkSize) {
+                                unsigned int temp_write_buffer = write_addr + blkSize;
+                                memcpy(write_buffer + write_buffer_using, (unsigned char *) &temp_write_buffer,
+                                       int_size);
+                                if (writeBlockToDisk(write_buffer, write_addr, buffer) != 0)
+                                    return -1;
+                                write_addr = temp_write_buffer;
+                                write_buffer_using = 0;
+                                write_buffer = getNewBlockInBuffer(buffer);
+                                freshBlockInBuffer(buffer, write_buffer);
+                            }
+                        }
+                    }
+                    unsigned int temp_s_next_addr;
+                    memcpy(&temp_s_next_addr, (unsigned int *) (s_read_buffer + blkSize - tuples_size), int_size);
+                    freeBlockInBuffer(s_read_buffer, buffer);
+                    if (temp_s_next_addr == 0)
+                        break;
+                    s_addr = temp_s_next_addr;
+                }
+            }
+            unsigned int temp_r_next_addr;
+            memcpy(&temp_r_next_addr, (unsigned int *) (r_read_buffer + blkSize - tuples_size), int_size);
+            freeBlockInBuffer(r_read_buffer, buffer);
+            if (temp_r_next_addr == 0)
+                break;
+            r_addr = temp_r_next_addr;
+        }
+    }
+
+    if (write_buffer_using == 0) {
+        freeBlockInBuffer(write_buffer, buffer);
+        if ((write_buffer = readBlockFromDisk(write_addr - blkSize, buffer)) == NULL) {
+            perror("Reading Block Failed!\n");
+            return -1;
+        }
+        memcpy(write_buffer + blkSize - int_size, (unsigned char *) &end_blk_next_addr, int_size);
+        if (writeBlockToDisk(write_buffer, write_addr - blkSize, buffer) != 0)
+            return -1;
+        return 0;
+    } else {
+        if (writeBlockToDisk(write_buffer, write_addr, buffer) != 0)
+            return -1;
+        return 0;
+    }
+}
+
+int outputJoinAnswer(Buffer *buffer) {
+    unsigned char *read_buffer;
+    unsigned int read_addr = join_answer_addr;
+    while (1) {
+        printf("blk: %d\n", read_addr);
+        if ((read_buffer = readBlockFromDisk(read_addr, buffer)) == NULL) {
+            perror("Reading Block Failed!\n");
+            return -1;
+        }
+        for (int i = 0; i < blkSize / int_size - 1; i += 3) {
+            int a, b, d;
+            memcpy(&a, (int *) (read_buffer + i * int_size), int_size);
+            memcpy(&b, (int *) (read_buffer + (i + 1) * int_size), int_size);
+            memcpy(&d, (int *) (read_buffer + (i + 2) * int_size), int_size);
+            printf("%d %d %d\n", a, b, d);
+        }
+        unsigned int temp_next_read_addr;
+        memcpy(&temp_next_read_addr, (unsigned int *) (read_buffer + blkSize - int_size), int_size);
         freeBlockInBuffer(read_buffer, buffer);
         if (temp_next_read_addr == 0)
             break;
