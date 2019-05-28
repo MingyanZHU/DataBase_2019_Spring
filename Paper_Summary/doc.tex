@@ -230,6 +230,11 @@ TOAIN能够通过调整Rank function来调整SCOB索引的参数，寻找Query�
 \section{相关工作}
 使用Dijkstra算法进行kNN查询，从查询q所在的节点开始进行Dijkstra算法，直到有k个最近的物体被搜索到即可。
 
+ROAD\cite{ROAD}同样是基于Dijkstra算法，但是主要是针对物体在network上面稀疏分布的情况。主要思想是将大图划分成若干个小图(文中称为Rnets)，然后在利用Dijkstra搜索时如果某个小图(Rnet)中没有物体，则关于这个小图的搜索就被跳过。
+
+G-Tree\cite{G-tree}也是建立了子图的层次结构，但是每个子图都与一个Occurrence-List关联，利用OL按照ID降序记录子图的层次结构。也因为其记录了更多的信息，所以在G树上查询很快，但更新较慢。
+
+V树\cite{V-tree}采用与G树类似的层次结构。V树标识位于子图边界的边界节点。通过维护这些边界节点的最近对象列表，设计了有效的技术来回答kNN查询。
 
 \appendix
 
@@ -244,6 +249,12 @@ TOAIN能够通过调整Rank function来调整SCOB索引的参数，寻找Query�
     \bibitem{ROAD}K. C. Lee, W.-C. Lee, B. Zheng, and Y. Tian. Road: A new
     spatial object search framework for road networks. TKDE,
     24(3):547–560, 2012.
+    \bibitem{G-tree}R. Zhong, G. Li, K.-L. Tan, L. Zhou, and Z. Gong. G-tree:
+    An efficient and scalable index for spatial search on road
+    networks. TKDE, 27(8):2175–2189, 2015.
+    \bibitem{V-tree}B. Shen, Y. Zhao, G. Li, Q. Y. Zheng, Weimin, B. Yuan, and
+    Y. Rao. V-tree: Efficient knn search on moving objects with
+    road-network constraints. In ICDE, pages 871–882, 2016.
 \end{thebibliography}
 
 \end{document}
