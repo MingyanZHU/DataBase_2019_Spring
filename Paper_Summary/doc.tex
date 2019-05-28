@@ -84,15 +84,19 @@ R_{q}=\frac{\lambda_{q}\left(t_{q}^{2}+V_{q}\right)}{2\left(1-\lambda_{q^{t} q}\
 \end{equation}
 
 \subsection{索引SCOB方面}
-在索引和算法方面，作者做出了两个假设，这两个假设虽然在后面进行了放松，但本质上论文作者最终解决的问题也没有彻底摆脱这第一个假设的约束，这一部分在后面%TODO 
-详细来说。两个假设分别是：
+
+\subsubsection{假设条件}\label{sec:assumptions}
+在索引和算法方面，作者做出了两个假设，分别是：
 \begin{enumerate}
 	\item 抽象后的图G是无向图
 	\item 所有节点的Rank是不一样的
 \end{enumerate}
 
+%这两个假设虽然在后面进行了放松，但本质上论文作者最终解决的问题也没有彻底摆脱这第一个假设的约束，这一部分在后面%TODO 
+%详细来说。
+
 \subsubsection{符号定义}
-\paragraph{SHORTCUT SET $SC_{<}$} 给定一个图$G=(V, E)$和一个定义在$V \to \mathbb{N}$上的Rank Function，则一条捷径(shortcut)$u \curvearrowright v \in SC_{<}$当且仅当1.$u, v \in V$，2.$r(u) < r(v)$，3.对于从$u$到$v$上最短路上的中间任意节点$z$均有$r(z) < r(u)$。
+\paragraph{SHORTCUT SET $SC_{<}$}\label{para:shortcut_set} 给定一个图$G=(V, E)$和一个定义在$V \to \mathbb{N}$上的Rank Function，则一条捷径(shortcut)$u \curvearrowright v \in SC_{<}$当且仅当1.$u, v \in V$，2.$r(u) < r(v)$，3.对于从$u$到$v$上最短路上的中间任意节点$z$均有$r(z) < r(u)$。
 
 从上面的定义我们可以直接得到一个结论，如式\eqref{lemma:3}，其中$SC_{<}$是从$G$上导出的捷径图(shortcut graph)，因为不一定所有的$G$上的最短路都符合$r(z) < r(u)$即上述定义的第3条规则。
 \begin{equation}
@@ -112,49 +116,120 @@ d_{G}(s, t)=d_{SC_{<}}(s, x)+d_{SC_{<}}(t, x)
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.6\linewidth]{media/downhill.png}
-	\caption{Query Algorithm}\label{fig:downhill}
+	\caption{Downhill Objects Example}\label{fig:downhill}
 \end{figure}
 \paragraph{$\mathbf{kDNNs}$}
 给定一个节点$u \in G$，离它最近的k个downhill objects被记作$kDNN(u)$。
 
-\subsubsection{基本思想}
+\subsubsection{基本思想}\label{sec:scob_basic}
 根据式\eqref{lemma:3}和$G$是无向图的假设，可以有结论\textit{给定一个节点$s$和一个位于节点$t$的物体$o$，如果$o$是$s$的kNN之一，则有$o \in kDNN(x)$，$x$是最短路$s \leadsto t$上的summit node}（其证明使用了证明其逆否命题的方法，主要利用三角不等式、式\eqref{lemma:3}进行放缩）。\textbf{通过以上结论，可以利用kDNN和一些特定的summit node可以得到一些源点的KNN结果。}
 
 SCOB索引本质上也是利用了Dijkstra在图上进行搜索，而传统的方式对于一个有M个节点的图，需要进行M次s-climb(从源点到summit node的搜索)以及M次t-climb(从目标点到summit node的搜索)；而使用了SCOB索引\textbf{在每个summit node上记录在Shortcut Graph中的k个最近的downhill objects的id和其距离，以减少s-climb(t-climb)的次数，来提高效率，最终实现了仅需要从Query发出的节点进行一次s-climb就可以找到对应这次Query的kNN结果}。
 
 具体如何维护SCOB索引，见\ref{sec:scob_index}节。
+
+\subsubsection{假设条件放松}\label{sec:assumptions_release}
+对\ref{sec:assumptions}节提到的两个假设，论文中分别进行了放松。对于第一个假设，其仅仅提到了一些做法，但在实际中可能并不适用，具体解释见\ref{sec:shortcoming}节。
+
+对于第二个假设，作者修改了\ref{para:shortcut_set}节中shortcut的定义，其中第2点改为$r(u) \leq r(v)$，进而将如此导出的图记为$SC_{\leq}$。进而称在$SC_{<}$上的climb为straight climb，而在$SC_{\leq}$上的climb为gentle climb。
 \subsection{算法TOAIN方面}
+\subsubsection{符号定义}\label{sec:toain_def}
+\paragraph{COVER NODES, COVER DIMENSION}
+将Road Network放在二维空间上的地图，然后利用$K \times K$个方格将其分成$K^2$个cell，对于给定的cell $C$，其外面有$3 \ times 3$和$5 \times 5$的邻居，则对于处在$C$的节点$u$，如果$u \leadsto v$必须穿过$3 \times 3$的邻居，其中在最短路径上且跨过边界的边$(x, y)$，那么称$x$为$C$的一个Cover Node，所有这样的Cover Node的数量称为Cover Dimension。\textbf{例子见\ref{sec:example_cover_nodes}节说明}。
+
+\subsubsection{基本思想}
+TOAIN能够通过调整Rank function来调整SCOB索引的参数，寻找Query和Update之间的折中，进而达到最大化吞吐量的目的。所以\textbf{TOAIN的主要思想就是如何确定更合理的Rank Function，使得越重要的顶点具有越高的Rank}。具体的算法描述见\ref{sec:toain_compute_rank}节所示。
 \section{基本算法描述}
 文中以伪代码形式讲述的算法共有4个，下面将分别进行描述。
 \subsection{SCOB Index}\label{sec:scob_index}
-\paragraph{Query}
+\subsubsection{Query}
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{media/query.png}
+	\includegraphics[width=0.6\linewidth]{media/query.png}
 	\caption{Query Algorithm}\label{fig:query}
 \end{figure}
-\paragraph{Insert}
+在SCOB索引上进行kNN查询，主要是利用从查询所在的节点开始Dijkstra算法，对于每一个遇到的节点利用其kDNN更新最终的结果集合$\mathcal{R}$，直到遍历完所有节点或者$\mathcal{R}$中已有k个节点且当前遇到的节点在$SC_{<}$中的距离已经超过$\mathcal{R}$中的最大距离停止。算法如图\ref{fig:query}所示。
+
+\textbf{由于其利用的是Dijkstra从原点进行搜索，所以其复杂度为$O(k|V|log|V|)$}。
+\subsubsection{Insert}
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{media/insert.png}
+	\includegraphics[width=0.6\linewidth]{media/insert.png}
 	\caption{Insert Algorithm}\label{fig:insert}
 \end{figure}
-\paragraph{Delete}
+对于插入一个物体$o$，则进行从$o$所在节点$t$的Dijkstra算法，更新所有中间经过的节点的kDNN集合。算法如图\ref{fig:insert}所示。
+
+\textbf{复杂度同样是Dijkstra的复杂度，即$O(|V|log|V|)$}。
+\subsubsection{Delete}
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{media/delete.png}
+	\includegraphics[width=0.6\linewidth]{media/delete.png}
 	\caption{Delete Algorithm}\label{fig:delete}
 \end{figure}
-\subsection{TOAIN}
-\paragraph{Compute Rank}
+删除一个物体$o$，则需要首先判断该物体是否在其所在节点的kDNN集合中，如果不在算法直接结束；否则，需要从该顶点进行Dijkstra算法，对所有经过且kDNN包含物体$o$的节点，将$o$从其对应的kDNN集合中删除，并且对于所有上述节点补充新的物体进入kDNN集合。算法如图\ref{fig:delete}所示。
+
+\textbf{复杂度为$O(|V|log|V| + |V||E|)$}。
+
+\textbf{对于系统中涉及到的Update操作，没有直接给出相应的算法，而是改为用一次Insert和一次Delete操作进行代替。}
+\subsection{TOAIN}\label{sec:toain_compute_rank}
+\subsubsection{Compute Rank}
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{media/compute_rank.png}
+	\includegraphics[width=0.6\linewidth]{media/compute_rank.png}
 	\caption{Compute Rank Algorithm}\label{fig:compute_rank}
 \end{figure}
-\section{算法分析}
+根据\ref{sec:toain_def}节的定义，可以有结论\textbf{较大Cell对应的Cover Nodes具有较高的重要性，且较高重要性的Cover Nodes应具有较高的Rank}。
 
+所以如图\ref{fig:compute_rank}所示的算法，先初始化所有的顶点rank为0，然后从1到h开始循环，较大的K逐步利用Dijkstra搜索进行更新遇到节点的rank值，同时不断减小K。
+
+\textbf{由于每次K对半分，所以Dijkstra经过的节点数目不超过$O(\zeta^*)$（Cover Dimension的上限），所以整体的复杂度为$O(h\zeta^*|V|log|V|)$}
+
+\subsubsection{climb}\label{sec:climb}
+对于TOAIN下面的climb，每次所经过的节点不会超过$h\zeta^*$个，根据上一节的分析显然成立，所以进行一次climb的时间复杂度为$O(h\zeta^*)$。
+
+\section{结论}
+根据\ref{sec:scob_basic}节，文中提出的算法针对每一次Query仅需一次s-climb，而根据\ref{sec:climb}可知每次climb的复杂度不超过$O(h\zeta^*)$，每一次Query时间复杂度为$O(h\zeta^*)$。调整$h$可以调整Query和Update之间的时间，从而达到最大化吞吐量的目的。
+
+根据\cite{zeta-most}，$\zeta^*$不会很大，所以Computer Rank实际的复杂度接近$O(|V|log|V|)$。
+
+最后根据论文中的实验结果，也侧面证实了其在相关算法中，无论对于实际例子还是生成数据，无论是BUA+QF模型还是RUA+FCFS模型，SCOB和TOAIN都是用时最少的。
 \section{举例说明}
+\subsection{COVER NODES, COVER DIMENSION}\label{sec:example_cover_nodes}
+如图\ref{fig:cover_nodes}所示，对于给定的Cell $C$，位于其中的节点$u$，其$3\times3, 5 \times 5$的邻居均在图中标出。其中对于$u$与任何节点的最短路而言，其均需要通过$i, d, o$中的一个才可以到达，而$(u, d), (u, i), (u, o)$均跨过了$C$的边界，所以$i, d, o$均为Cover Nodes，且$C$的Cover Dimension为3。
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.7\linewidth]{media/cover_nodes.png}
+	\caption{Cover Nodes example}\label{fig:cover_nodes}
+\end{figure}
+
+\subsection{COMPUTER RANK}
+如图\ref{fig:example loop 1}所示，初始化$K=10$，$h=2$，图中所有的蓝色标记表示一个节点，红色数字表示该节点的rank值，橙色线段表示边，黑色方框表示Grid。
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.7\linewidth]{media/example-1.jpg}
+	\caption{Loop 1}\label{fig:example loop 1}
+\end{figure}
+
+\textbf{可以看到，在初始化的第一次循化会将所有节点的Rank都更新为1，此时的$S$仍然包含所有的节点。}
+
+进入第二轮循环，此时$K$被更新为5，所有的Dijkstra算法都不会超过其对应的最小的$5 \times 5$的Grid。所有cover nodes的权值被更新为2，如图\ref{fig:example loop 2}所示。
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.7\linewidth]{media/example-2.jpg}
+	\caption{Loop 2}\label{fig:example loop 2}
+\end{figure}
+
+由于继续更新，$K$会小于5，而此时与循环中需要对其所在的$5 \times 5$的Grid进行Dijkstra算法，所以$K$不够大导致算法停止，最终结果如图\ref{fig:example loop 2}所示。\textbf{可以看到，最终Rank值较大的节点，也是具有较高连通度的节点，这与使用\textit{betweenness centrality}进行rank赋值，具有相似性，说明了此算法的合理性}。
+\section{算法的不足}\label{sec:shortcoming}
+在论文中，作者提出放松\ref{sec:assumptions}节中第一个假设的方式，是针对将有向图的所有边均取反，这种做法可能导致整体计算Shortcut Graph时间复杂度变化，并且在现实中确实\textbf{存在单行线}，如果简单对其取反可能缺少实际的物理意义，继而可能引入并不存在的边导致实际距离估计偏差较大的问题，如存在最短路径$s \leadsto t$，且$x$为其上的summit node，而此时$d_{SC_{<}}(t, x) \neq d_{SC_{<}}(x, t)$，进而导致式\eqref{lemma:4}不成立。
+
+在相关的实验中，作者也没有进行关于Road Network中真正存在单向边，无法将其转化为无向图处理的情况提供相应的实验数据，也侧面说明了在这一部分TOAIN和SCOB结合起来对于存在大量单向边的情况处理有所困难。
+\section{改进方法}
+
+\section{相关工作}
+使用Dijkstra算法进行kNN查询，从查询q所在的节点开始进行Dijkstra算法，直到有k个最近的物体被搜索到即可。
+
 
 \appendix
 
@@ -163,6 +238,12 @@ SCOB索引本质上也是利用了Dijkstra在图上进行搜索，而传统的�
 \begin{thebibliography}{20}
     \bibitem{toain} Luo, S., Kao, B., Li, G., Hu, J., Cheng, R., \& Zheng, Y. (2018). TOAIN: a throughput optimizing adaptive index for answering dynamic k NN queries on road networks. Proceedings of the VLDB Endowment, 11(5), 594-606.
     \bibitem{single-server-queue} J. W. Cohen. The single server queue, volume 8. Elsevier, 2012.
+    \bibitem{zeta-most}S. Luo, R. Cheng, X. Xiao, B. Kao, S. Zhou, and J. Hu. Fast
+    matching of detour routes and service areas. Technical
+    Report TR-2016-03, The University of Hong Kong, 2016.
+    \bibitem{ROAD}K. C. Lee, W.-C. Lee, B. Zheng, and Y. Tian. Road: A new
+    spatial object search framework for road networks. TKDE,
+    24(3):547–560, 2012.
 \end{thebibliography}
 
 \end{document}
