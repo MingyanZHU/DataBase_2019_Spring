@@ -170,11 +170,27 @@
             WHERE Classes.class = Ships.class
             GROUP BY Classes.class;
         \end{minted}
-        \item[7)]\begin{minted}{SQL}
+        \item[7)]
+        \textbf{下面这种写法存在问题，对于没有船沉没但是有超过3艘船的类型，没有输出！}
+        \begin{minted}{SQL}
             SELECT class, COUNT(result)
             FROM Ships, Outcomes
             WHERE Ships.name = Outcomes.ship
                 AND Outcomes.result = "sunk"
+                AND class IN
+                (
+                    SELECT class
+                    FROM Ships, Outcomes
+                    WHERE Ships.name = Outcomes.ship
+                        GROUP BY class HAVING COUNT(*) >= 3
+                )
+                GROUP BY class;
+        \end{minted}
+		\textbf{应该改为如下写法，注意不使用where过滤是否沉船条件：}
+		\begin{minted}{SQL}
+            SELECT class, SUM(case 1 when Outcomes.result = "sunk" else 0 end)
+            FROM Ships, Outcomes
+            WHERE Ships.name = Outcomes.ship
                 AND class IN
                 (
                     SELECT class
