@@ -141,7 +141,7 @@
 				\caption{日志文件}\label{tab:5_a}
 				\end{table}
 			\item \textbf{T1和T2需要Redo，T3和T0需要Undo}。根据日志文件，在故障恢复时T1和T2已经提交，需要Redo；而T0和T3未提交故Undo，需要消除其影响。
-			\item \textbf{需要增加<T0, abort>和<T3, abort>}，表明T0和T3在故障中终止未提交。
+			\item \textbf{需要增加<T0, A, 50>，<T0, abort>和<T3, D 15><T3, abort>}，表明T0和T3在故障中终止未提交。
 		\end{enumerate}
 	\end{enumerate}
 \end{document}
