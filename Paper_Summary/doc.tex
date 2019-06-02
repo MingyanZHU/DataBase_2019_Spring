@@ -20,7 +20,7 @@
 \end{center}
 
 \section{解决的问题}
-选择的论文\cite{toain}为2018年PVLDB上面的一篇文章，\textbf{主要解决的问题是Road Networks上面动态的kNN查询}。
+选择的论文\cite{toain}为2018年PVLDB上面的一篇文章，\textbf{主要解决的问题是Road Networks上面动态的kNN查询，论文编号35}。
 
 针对这个问题，作者主要有如下\textbf{三个方面}的工作：
 \begin{enumerate}
@@ -226,15 +226,32 @@ TOAIN能够通过调整Rank function来调整SCOB索引的参数，寻找Query�
 
 在相关的实验中，作者也没有进行关于Road Network中真正存在单向边，无法将其转化为无向图处理的情况提供相应的实验数据，也侧面说明了在这一部分TOAIN和SCOB结合起来对于存在大量单向边的情况处理有所困难。
 \section{改进方法}
+由于SCOB索引和TOAIN算法设计的非常精巧，如果简单的想做基于这个索引的改进，会破坏掉其上面的性质，导致时间复杂度的变化较大，所以很抱歉我没有想到较好的改进方法。
+\section{相关工作(小综述)}
+使用Dijkstra算法进行kNN查询，从查询q所在的节点开始进行Dijkstra算法，直到有k个最近的物体被搜索到即可。这样没有维护索引的需要，但对于
 
-\section{相关工作}
-使用Dijkstra算法进行kNN查询，从查询q所在的节点开始进行Dijkstra算法，直到有k个最近的物体被搜索到即可。
+ROAD\cite{ROAD}同样是基于Dijkstra算法，但是主要是针对物体在network上面稀疏分布的情况。主要思想是将大图划分成若干个小图(文中称为Rnets)，然后在利用Dijkstra搜索时如果某个小图(Rnet)中没有物体，则关于这个小图的搜索就被跳过。\cite{ROAD}中主要使用的两类索引，Route Overlay和Association Directory，其中前者维护物理上的network结构包括shortcut，后者用来维护物体到节点、边以及Rnets的映射。其基本结构如图\ref{fig:ROAD}所示。
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.8\linewidth]{media/ROAD.png}
+	\caption{ROAD framework}\label{fig:ROAD}
+\end{figure}
 
-ROAD\cite{ROAD}同样是基于Dijkstra算法，但是主要是针对物体在network上面稀疏分布的情况。主要思想是将大图划分成若干个小图(文中称为Rnets)，然后在利用Dijkstra搜索时如果某个小图(Rnet)中没有物体，则关于这个小图的搜索就被跳过。
+G-Tree\cite{G-tree}也是建立了子图的层次结构，但是每个子图都与一个Occurrence-List关联，利用OL按照ID降序记录子图的层次结构。在G树上预计算并记录了基础节点之间的最短距离，然后通过这些基础点之间的距离和图的层次结构再计算其余节点之间的最短距离。也因为其记录了更多的信息，所以在G树上查询很快，但更新较慢。G树的基本结构如图\ref{fig:G-tree}所示。在G-Tree上进行KNN查询的时间复杂度为$\mathcal{O}\left(\tau \log \tau+\log _{2}^{2} f \cdot \log _{f} \frac{|\mathcal{V}|}{\tau} \cdot|\mathcal{V}|\right)$，其中$\tau$为每个叶节点最多含有的顶点数目。
 
-G-Tree\cite{G-tree}也是建立了子图的层次结构，但是每个子图都与一个Occurrence-List关联，利用OL按照ID降序记录子图的层次结构。也因为其记录了更多的信息，所以在G树上查询很快，但更新较慢。
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.9\linewidth]{media/g-tree.png}
+	\caption{G-Tree Example}\label{fig:G-tree}
+\end{figure}
 
-V树\cite{V-tree}采用与G树类似的层次结构。V树标识位于子图边界的边界节点。通过维护这些边界节点的最近对象列表，设计了有效的技术来回答kNN查询。
+V树\cite{V-tree}采用与G树类似的层次结构，如图\ref{fig:V-tree}所示。V树标识位于子图边界的边界节点。通过维护这些边界节点的最近对象列表，设计了有效的技术来回答kNN查询。
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.9\linewidth]{media/v-tree.png}
+	\caption{V-Tree Example}\label{fig:V-tree}
+\end{figure}
 
 \appendix
 
