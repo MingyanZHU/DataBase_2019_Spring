@@ -253,6 +253,26 @@ V树\cite{V-tree}采用与G树类似的层次结构，如图\ref{fig:V-tree}所�
 	\caption{V-Tree Example}\label{fig:V-tree}
 \end{figure}
 
+以上这些论文是比较新的针对在Road Network上动态的KNN查询的问题进行的，并且当前也是效率比较高的。除此之外还有一些比较久远的论文（大约在2005年左右的），效率没有很高，但是还有一定的参考价值。
+
+\cite{IER}提出的是一个针对空间网络（并非完全的路径距离，而是欧式距离的限制）上通用查询的网络，将输入的网络生成一个图模型(Modeling Graph)，并将其按照三种分量进行存储，邻接分量(adjacency component)，network R-tree以及poly-line分量，如图\ref{fig:ier}所示。在执行KNN查询时，使用的是IER(Incremental Euclidean Restriction)，通过多轮用于高维相似性检索来实现kNN，即先假设做1-NN，再逐步放松距离至实现kNN。
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\linewidth]{media/IER}
+	\caption{IER example}
+	\label{fig:ier}
+\end{figure}
+
+\cite{DisBrw}提出的是通过预计算在图上所有可能点之间的最短距离，然后编码从u到其余节点的最短路径，并将其分到多个子图中。利用Shortest Path Quadtree这个数据结构来维护最短距离，如图\ref{fig:disbrw}所示，想找到s到d的最短路径，从s对应的子树查询到去d需要经过t的区域，然后获得t的子树直到可以在子树中找到d即可。与其类似的利用预计算图上的最短距离的做法还有\cite{voronoi}，不过其使用的数据结构为Voronoi Diagram。
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{media/DisBrw}
+	\caption{Shortest Path Quadtree example}
+	\label{fig:disbrw}
+\end{figure}
+
+
 \appendix
 
 % \section{源代码}
@@ -272,6 +292,15 @@ V树\cite{V-tree}采用与G树类似的层次结构，如图\ref{fig:V-tree}所�
     \bibitem{V-tree}B. Shen, Y. Zhao, G. Li, Q. Y. Zheng, Weimin, B. Yuan, and
     Y. Rao. V-tree: Efficient knn search on moving objects with
     road-network constraints. In ICDE, pages 871–882, 2016.
+    \bibitem{IER} D. Papadias, J. Zhang, N. Mamoulis, and Y. Tao. Query
+    processing in spatial network databases. In PVLDB, pages
+    802–813, 2003.
+    \bibitem{DisBrw} H. Samet, J. Sankaranarayanan, and H. Alborzi. Scalable
+    network distance browsing in spatial databases. In SIGMOD,
+    pages 43–54, 2008.
+    \bibitem{voronoi} M. Kolahdouzan and C. Shahabi. Voronoi-based k
+    nearest neighbor search for spatial network databases.
+    In Proceedings of VLDB, pages 840–851, 2004.
 \end{thebibliography}
 
 \end{document}
